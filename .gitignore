@@ -1,0 +1,28 @@
+# Python and local tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Local environments and secrets
+.env
+.venv/
+venv/
+
+# Datasets, checkpoints, and regenerated outputs
+data/raw/
+data/processed/
+rebuild/
+outputs/
+checkpoints/
+logs/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db

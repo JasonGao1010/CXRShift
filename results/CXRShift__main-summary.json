@@ -1,0 +1,1126 @@
+{
+  "schema_version": 2,
+  "analysis_specification": {
+    "estimand": "Per-image arithmetic mean of P(PNEUMONIA) from seeds 42, 43, and 44; metrics are computed once on the resulting probability ensemble.",
+    "ensemble_seeds": [
+      42,
+      43,
+      44
+    ],
+    "decision_threshold": 0.5,
+    "bootstrap": {
+      "method": "nonparametric percentile grouped bootstrap",
+      "iterations": 5000,
+      "confidence_level": 0.95,
+      "quantile_interpolation": "linear",
+      "seed": 20260710,
+      "paired_comparisons": "candidate minus strict baseline on identical resampled groups"
+    },
+    "grouping_keys": {
+      "kermany_grouped": "conservative subtype-agnostic filename cluster: equal personN counters in bacterial and viral filenames remain grouped; NORMAL uses the exam-like filename prefix",
+      "rsna": "RSNA patientId, equal to the image filename stem"
+    }
+  },
+  "groups": [
+    {
+      "dataset": "Kermany-FG",
+      "model": "DenseNet121",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__DenseNet121__ERM__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM__s44__Kermany-FG__test__predictions.csv"
+      ],
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.9709401709401709,
+          "balanced_accuracy": 0.9670330079171379,
+          "precision": 0.9846698113207547,
+          "recall": 0.9754672897196262,
+          "specificity": 0.9585987261146497,
+          "f1": 0.9800469483568075,
+          "roc_auc": 0.99277486755164,
+          "auprc": 0.9974185672682316,
+          "brier_score": 0.022594186131524918
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.9777777777777777,
+          "balanced_accuracy": 0.9767471278052264,
+          "precision": 0.9905437352245863,
+          "recall": 0.9789719626168224,
+          "specificity": 0.9745222929936306,
+          "f1": 0.9847238542890717,
+          "roc_auc": 0.992730222037026,
+          "auprc": 0.9966248301562554,
+          "brier_score": 0.018767223158358978
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.9769230769230769,
+          "balanced_accuracy": 0.9701135484255015,
+          "precision": 0.9836639439906651,
+          "recall": 0.9848130841121495,
+          "specificity": 0.9554140127388535,
+          "f1": 0.9842381786339754,
+          "roc_auc": 0.9933329364843145,
+          "auprc": 0.9970144546681929,
+          "brier_score": 0.018052664257051078
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.9803418803418803,
+        "balanced_accuracy": 0.9764829751770938,
+        "precision": 0.9882766705744431,
+        "recall": 0.9848130841121495,
+        "specificity": 0.9681528662420382,
+        "f1": 0.986541837331773,
+        "roc_auc": 0.994523483540687,
+        "auprc": 0.997889827071855,
+        "brier_score": 0.017545187700722945
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.9717062459336371,
+          0.9879626834551755
+        ],
+        "balanced_accuracy": [
+          0.9652148084083996,
+          0.9863888527917649
+        ],
+        "precision": [
+          0.9803921568627451,
+          0.9948024948024948
+        ],
+        "recall": [
+          0.9758342922899885,
+          0.9923997031295098
+        ],
+        "specificity": [
+          0.9473684210526315,
+          0.9853372434017595
+        ],
+        "f1": [
+          0.9803915908164652,
+          0.9918078830792618
+        ],
+        "roc_auc": [
+          0.9903765699787522,
+          0.9977751648545031
+        ],
+        "auprc": [
+          0.9961324999883685,
+          0.9992131539251915
+        ],
+        "brier_score": [
+          0.012011954454914854,
+          0.02375335767608491
+        ]
+      }
+    },
+    {
+      "dataset": "Kermany-FG",
+      "model": "ConvNeXt-Tiny",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s44__Kermany-FG__test__predictions.csv"
+      ],
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.976068376068376,
+          "balanced_accuracy": 0.9745706589677957,
+          "precision": 0.9893617021276596,
+          "recall": 0.977803738317757,
+          "specificity": 0.9713375796178344,
+          "f1": 0.9835487661574618,
+          "roc_auc": 0.9970719983332341,
+          "auprc": 0.9989091564448129,
+          "brier_score": 0.018601194681389766
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.9777777777777777,
+          "balanced_accuracy": 0.9727141496517651,
+          "precision": 0.9859484777517564,
+          "recall": 0.9836448598130841,
+          "specificity": 0.9617834394904459,
+          "f1": 0.9847953216374269,
+          "roc_auc": 0.9968376093815108,
+          "auprc": 0.9988230197063033,
+          "brier_score": 0.017756656832335262
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.9752136752136752,
+          "balanced_accuracy": 0.9639041014346093,
+          "precision": 0.9780346820809248,
+          "recall": 0.9883177570093458,
+          "specificity": 0.9394904458598726,
+          "f1": 0.9831493317838466,
+          "roc_auc": 0.9951671230430382,
+          "auprc": 0.9981585564782138,
+          "brier_score": 0.020454031411080858
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.9777777777777777,
+        "balanced_accuracy": 0.9727141496517651,
+        "precision": 0.9859484777517564,
+        "recall": 0.9836448598130841,
+        "specificity": 0.9617834394904459,
+        "f1": 0.9847953216374269,
+        "roc_auc": 0.9967483183522828,
+        "auprc": 0.9987781485250203,
+        "brier_score": 0.017280218744681247
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.9688026635321222,
+          0.9859739947287198
+        ],
+        "balanced_accuracy": [
+          0.9601191874784891,
+          0.9835276472185243
+        ],
+        "precision": [
+          0.9771627745186522,
+          0.9933048691860464
+        ],
+        "recall": [
+          0.9745306176465566,
+          0.991715976331361
+        ],
+        "specificity": [
+          0.9384589041095891,
+          0.9812514602803737
+        ],
+        "f1": [
+          0.9784333996287018,
+          0.9905105621586257
+        ],
+        "roc_auc": [
+          0.9944759959765993,
+          0.9985403006255295
+        ],
+        "auprc": [
+          0.9978250693290077,
+          0.9994708265498132
+        ],
+        "brier_score": [
+          0.011436947078609861,
+          0.02380420198793891
+        ]
+      }
+    },
+    {
+      "dataset": "Kermany-FG",
+      "model": "ViT-B/16",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__ViT-B16__ERM__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__ViT-B16__ERM__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__ViT-B16__ERM__s44__Kermany-FG__test__predictions.csv"
+      ],
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.9854700854700855,
+          "balanced_accuracy": 0.9830123816893863,
+          "precision": 0.9917936694021102,
+          "recall": 0.9883177570093458,
+          "specificity": 0.9777070063694268,
+          "f1": 0.9900526623756583,
+          "roc_auc": 0.997001309601762,
+          "auprc": 0.9989212007866478,
+          "brier_score": 0.013935349033795917
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.9743589743589743,
+          "balanced_accuracy": 0.9734024346687302,
+          "precision": 0.9893364928909952,
+          "recall": 0.9754672897196262,
+          "specificity": 0.9713375796178344,
+          "f1": 0.9823529411764704,
+          "roc_auc": 0.9960377105780106,
+          "auprc": 0.9985657998294759,
+          "brier_score": 0.021337718375756425
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.9743589743589743,
+          "balanced_accuracy": 0.9744106792070957,
+          "precision": 0.9904988123515439,
+          "recall": 0.9742990654205608,
+          "specificity": 0.9745222929936306,
+          "f1": 0.9823321554770318,
+          "roc_auc": 0.9963688314780642,
+          "auprc": 0.9986676703430186,
+          "brier_score": 0.020518453085539363
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.982051282051282,
+        "balanced_accuracy": 0.9816841776296208,
+        "precision": 0.9929161747343566,
+        "recall": 0.9824766355140186,
+        "specificity": 0.9808917197452229,
+        "f1": 0.9876688197298884,
+        "roc_auc": 0.9968450503006131,
+        "auprc": 0.9988487658844711,
+        "brier_score": 0.01656255662176458
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.9739442215334907,
+          0.9893004115226337
+        ],
+        "balanced_accuracy": [
+          0.972284245885904,
+          0.9898581146066882
+        ],
+        "precision": [
+          0.986469864698647,
+          0.9977401767609136
+        ],
+        "recall": [
+          0.9728803096882193,
+          0.9909096062667492
+        ],
+        "specificity": [
+          0.9640522875816994,
+          0.9937699541417542
+        ],
+        "f1": [
+          0.9819277108433735,
+          0.9927007299270073
+        ],
+        "roc_auc": [
+          0.9945302114083358,
+          0.9986273607926621
+        ],
+        "auprc": [
+          0.9979272527474214,
+          0.9995111059338858
+        ],
+        "brier_score": [
+          0.010990764486368567,
+          0.02283531838504067
+        ]
+      }
+    },
+    {
+      "dataset": "RSNA-1707",
+      "model": "DenseNet121",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__DenseNet121__ERM__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM__s44__RSNA-1707__test__predictions.csv"
+      ],
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.6470588235294118,
+          "balanced_accuracy": 0.6380698698903801,
+          "precision": 0.5962059620596206,
+          "recall": 0.9691629955947136,
+          "specificity": 0.30697674418604654,
+          "f1": 0.738255033557047,
+          "roc_auc": 0.7934637844483147,
+          "auprc": 0.7757619723701469,
+          "brier_score": 0.30067638244086403
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.669683257918552,
+          "balanced_accuracy": 0.6614486220674111,
+          "precision": 0.6134453781512605,
+          "recall": 0.9647577092511013,
+          "specificity": 0.3581395348837209,
+          "f1": 0.75,
+          "roc_auc": 0.8064542567359901,
+          "auprc": 0.7880432514587439,
+          "brier_score": 0.2988221193936906
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.667420814479638,
+          "balanced_accuracy": 0.6594918553426903,
+          "precision": 0.6136363636363636,
+          "recall": 0.9515418502202643,
+          "specificity": 0.3674418604651163,
+          "f1": 0.7461139896373057,
+          "roc_auc": 0.8235016904005737,
+          "auprc": 0.8209513114967217,
+          "brier_score": 0.29160711691637403
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.667420814479638,
+        "balanced_accuracy": 0.6591230406720623,
+        "precision": 0.611731843575419,
+        "recall": 0.9647577092511013,
+        "specificity": 0.35348837209302325,
+        "f1": 0.7487179487179488,
+        "roc_auc": 0.8151623809035959,
+        "auprc": 0.8036194820296241,
+        "brier_score": 0.29194965972578474
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.6221719457013575,
+          0.7104072398190046
+        ],
+        "balanced_accuracy": [
+          0.6251824075674682,
+          0.69422905783107
+        ],
+        "precision": [
+          0.5609738824017135,
+          0.6610181360679864
+        ],
+        "recall": [
+          0.9392523364485982,
+          0.9865485866431773
+        ],
+        "specificity": [
+          0.2911377547988352,
+          0.4184788594139054
+        ],
+        "f1": [
+          0.7084060077519381,
+          0.7859427591438982
+        ],
+        "roc_auc": [
+          0.7735065760233559,
+          0.8531500717697309
+        ],
+        "auprc": [
+          0.7444482868947238,
+          0.8572506392326785
+        ],
+        "brier_score": [
+          0.2550808275729861,
+          0.33088334844181294
+        ]
+      }
+    },
+    {
+      "dataset": "RSNA-1707",
+      "model": "ConvNeXt-Tiny",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__ConvNeXt-Tiny__ERM__s44__RSNA-1707__test__predictions.csv"
+      ],
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.6855203619909502,
+          "balanced_accuracy": 0.678834135846737,
+          "precision": 0.6325301204819277,
+          "recall": 0.9251101321585903,
+          "specificity": 0.4325581395348837,
+          "f1": 0.7513416815742398,
+          "roc_auc": 0.8018850527609876,
+          "auprc": 0.7925880475529106,
+          "brier_score": 0.2660435944385192
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.6855203619909502,
+          "balanced_accuracy": 0.6789570740702797,
+          "precision": 0.6333333333333333,
+          "recall": 0.920704845814978,
+          "specificity": 0.4372093023255814,
+          "f1": 0.7504488330341113,
+          "roc_auc": 0.8157360926134617,
+          "auprc": 0.8247178958848566,
+          "brier_score": 0.2748982559595682
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.6809954751131222,
+          "balanced_accuracy": 0.6751664788443807,
+          "precision": 0.6352201257861635,
+          "recall": 0.8898678414096917,
+          "specificity": 0.4604651162790698,
+          "f1": 0.7412844036697248,
+          "roc_auc": 0.7868046306730868,
+          "auprc": 0.7876771704532398,
+          "brier_score": 0.2534860515004227
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.6764705882352942,
+        "balanced_accuracy": 0.6695318102653416,
+        "precision": 0.625,
+        "recall": 0.9251101321585903,
+        "specificity": 0.413953488372093,
+        "f1": 0.7460035523978685,
+        "roc_auc": 0.8039545128572892,
+        "auprc": 0.8042785175165363,
+        "brier_score": 0.25967884021146387
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.6312217194570136,
+          0.7194570135746606
+        ],
+        "balanced_accuracy": [
+          0.6323863011119772,
+          0.7059509183610786
+        ],
+        "precision": [
+          0.5722882860923463,
+          0.6756756756756757
+        ],
+        "recall": [
+          0.8899072464939578,
+          0.9571428571428572
+        ],
+        "specificity": [
+          0.34802922241858114,
+          0.4786779921233562
+        ],
+        "f1": [
+          0.7037019332908434,
+          0.7838334908284834
+        ],
+        "roc_auc": [
+          0.7612446846837705,
+          0.8425919027196275
+        ],
+        "auprc": [
+          0.7509180826515494,
+          0.8520034190279111
+        ],
+        "brier_score": [
+          0.22446380643681768,
+          0.29615568115743374
+        ]
+      }
+    },
+    {
+      "dataset": "RSNA-1707",
+      "model": "ViT-B/16",
+      "recipe": "ERM",
+      "prediction_files": [
+        "results/CXRShift__ViT-B16__ERM__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__ViT-B16__ERM__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__ViT-B16__ERM__s44__RSNA-1707__test__predictions.csv"
+      ],
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "seed_results": [
+        {
+          "seed": 42,
+          "accuracy": 0.6357466063348416,
+          "balanced_accuracy": 0.6273025304784345,
+          "precision": 0.5916666666666667,
+          "recall": 0.9383259911894273,
+          "specificity": 0.31627906976744186,
+          "f1": 0.7257240204429302,
+          "roc_auc": 0.806013728101629,
+          "auprc": 0.8075172803420279,
+          "brier_score": 0.3184336331017645
+        },
+        {
+          "seed": 43,
+          "accuracy": 0.665158371040724,
+          "balanced_accuracy": 0.6566745210531708,
+          "precision": 0.6094182825484764,
+          "recall": 0.9691629955947136,
+          "specificity": 0.34418604651162793,
+          "f1": 0.7482993197278911,
+          "roc_auc": 0.8240241778506301,
+          "auprc": 0.8230494924459892,
+          "brier_score": 0.283781888605022
+        },
+        {
+          "seed": 44,
+          "accuracy": 0.6787330316742082,
+          "balanced_accuracy": 0.6713656387665199,
+          "precision": 0.6239067055393586,
+          "recall": 0.9427312775330396,
+          "specificity": 0.4,
+          "f1": 0.750877192982456,
+          "roc_auc": 0.8212683126728819,
+          "auprc": 0.8301561741090102,
+          "brier_score": 0.2749821053889939
+        }
+      ],
+      "ensemble": {
+        "accuracy": 0.667420814479638,
+        "balanced_accuracy": 0.6593689171191477,
+        "precision": 0.6129943502824858,
+        "recall": 0.9559471365638766,
+        "specificity": 0.3627906976744186,
+        "f1": 0.7469879518072289,
+        "roc_auc": 0.8236451183280401,
+        "auprc": 0.8299617257604598,
+        "brier_score": 0.2832613064935592
+      },
+      "ensemble_group_bootstrap_95ci": {
+        "accuracy": [
+          0.6221719457013575,
+          0.7081447963800905
+        ],
+        "balanced_accuracy": [
+          0.6248005167680062,
+          0.6934984914520311
+        ],
+        "precision": [
+          0.5619596541786743,
+          0.6619718309859155
+        ],
+        "recall": [
+          0.9275955253896431,
+          0.9809546377792823
+        ],
+        "specificity": [
+          0.2967998295864193,
+          0.4258373205741627
+        ],
+        "f1": [
+          0.7062937062937064,
+          0.7841845140032949
+        ],
+        "roc_auc": [
+          0.7840543515443206,
+          0.8606732459861575
+        ],
+        "auprc": [
+          0.7830837476353247,
+          0.8717768186103837
+        ],
+        "brier_score": [
+          0.24775051384486504,
+          0.32098169216384975
+        ]
+      }
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "candidate_recipe": "ERM-Reg",
+      "baseline_recipe": "ERM",
+      "dataset": "Kermany-FG",
+      "model": "DenseNet121",
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "baseline_ensemble": {
+        "accuracy": 0.9803418803418803,
+        "balanced_accuracy": 0.9764829751770938,
+        "precision": 0.9882766705744431,
+        "recall": 0.9848130841121495,
+        "specificity": 0.9681528662420382,
+        "f1": 0.986541837331773,
+        "roc_auc": 0.994523483540687,
+        "auprc": 0.997889827071855,
+        "brier_score": 0.017545187700722945
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.9769230769230769,
+        "balanced_accuracy": 0.9771712601940592,
+        "precision": 0.9916963226571768,
+        "recall": 0.9766355140186916,
+        "specificity": 0.9777070063694268,
+        "f1": 0.9841082989994114,
+        "roc_auc": 0.9943858265372939,
+        "auprc": 0.9950966787064965,
+        "brier_score": 0.03177136073616054
+      },
+      "candidate_minus_baseline": {
+        "accuracy": -0.0034188034188034067,
+        "balanced_accuracy": 0.0006882850169653842,
+        "precision": 0.0034196520827336485,
+        "recall": -0.008177570093457875,
+        "specificity": 0.009554140127388533,
+        "f1": -0.0024335383323615956,
+        "roc_auc": -0.00013765700339307685,
+        "auprc": -0.0027931483653584888,
+        "brier_score": 0.014226173035437596
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          -0.009772131740861388,
+          0.002622434979718532
+        ],
+        "balanced_accuracy": [
+          -0.005376827570202009,
+          0.0078618339217754
+        ],
+        "precision": [
+          -5.753858484287278e-05,
+          0.00807117546890955
+        ],
+        "recall": [
+          -0.01641137855579866,
+          -0.0011805680132053195
+        ],
+        "specificity": [
+          0.0,
+          0.022222222222222254
+        ],
+        "f1": [
+          -0.006935223692021275,
+          0.001773245257581572
+        ],
+        "roc_auc": [
+          -0.005114881537544402,
+          0.0031947341712467887
+        ],
+        "auprc": [
+          -0.01061785471806737,
+          0.0012371973727370695
+        ],
+        "brier_score": [
+          0.011202240580743645,
+          0.01709044807399501
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__ERM-Reg__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM-Reg__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM-Reg__s44__Kermany-FG__test__predictions.csv"
+      ]
+    },
+    {
+      "candidate_recipe": "ERM-Reg",
+      "baseline_recipe": "ERM",
+      "dataset": "RSNA-1707",
+      "model": "DenseNet121",
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "baseline_ensemble": {
+        "accuracy": 0.667420814479638,
+        "balanced_accuracy": 0.6591230406720623,
+        "precision": 0.611731843575419,
+        "recall": 0.9647577092511013,
+        "specificity": 0.35348837209302325,
+        "f1": 0.7487179487179488,
+        "roc_auc": 0.8151623809035959,
+        "auprc": 0.8036194820296241,
+        "brier_score": 0.29194965972578474
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.7285067873303167,
+        "balanced_accuracy": 0.7232660588054503,
+        "precision": 0.6731391585760518,
+        "recall": 0.9162995594713657,
+        "specificity": 0.5302325581395348,
+        "f1": 0.7761194029850746,
+        "roc_auc": 0.800184407335314,
+        "auprc": 0.7654221566305666,
+        "brier_score": 0.1915384085334921
+      },
+      "candidate_minus_baseline": {
+        "accuracy": 0.06108597285067874,
+        "balanced_accuracy": 0.06414301813338796,
+        "precision": 0.06140731500063279,
+        "recall": -0.048458149779735615,
+        "specificity": 0.1767441860465116,
+        "f1": 0.027401454267125813,
+        "roc_auc": -0.0149779735682819,
+        "auprc": -0.03819732539905751,
+        "brier_score": -0.10041125119229263
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          0.03167420814479638,
+          0.09276018099547512
+        ],
+        "balanced_accuracy": [
+          0.03473615250818068,
+          0.09409587795880316
+        ],
+        "precision": [
+          0.038685256763425685,
+          0.08649740534910183
+        ],
+        "recall": [
+          -0.07929515418502198,
+          -0.022026431718061623
+        ],
+        "specificity": [
+          0.12669683257918551,
+          0.2315329076724666
+        ],
+        "f1": [
+          0.005457915276518547,
+          0.04955678688106243
+        ],
+        "roc_auc": [
+          -0.033700348779991576,
+          0.0029639263084054535
+        ],
+        "auprc": [
+          -0.07335389750345028,
+          -0.00028495267834222266
+        ],
+        "brier_score": [
+          -0.12333184002286211,
+          -0.0781673692355515
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__ERM-Reg__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM-Reg__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__ERM-Reg__s44__RSNA-1707__test__predictions.csv"
+      ]
+    },
+    {
+      "candidate_recipe": "JT",
+      "baseline_recipe": "ERM",
+      "dataset": "Kermany-FG",
+      "model": "DenseNet121",
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "baseline_ensemble": {
+        "accuracy": 0.9803418803418803,
+        "balanced_accuracy": 0.9764829751770938,
+        "precision": 0.9882766705744431,
+        "recall": 0.9848130841121495,
+        "specificity": 0.9681528662420382,
+        "f1": 0.986541837331773,
+        "roc_auc": 0.994523483540687,
+        "auprc": 0.997889827071855,
+        "brier_score": 0.017545187700722945
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.9717948717948718,
+        "balanced_accuracy": 0.9706418536817667,
+        "precision": 0.9881376037959668,
+        "recall": 0.9731308411214953,
+        "specificity": 0.9681528662420382,
+        "f1": 0.9805768098881696,
+        "roc_auc": 0.9955875349723198,
+        "auprc": 0.9982603462779425,
+        "brier_score": 0.02279799721528002
+      },
+      "candidate_minus_baseline": {
+        "accuracy": -0.008547008547008517,
+        "balanced_accuracy": -0.005841121495327117,
+        "precision": -0.00013906677847630444,
+        "recall": -0.011682242990654235,
+        "specificity": 0.0,
+        "f1": -0.005965027443603388,
+        "roc_auc": 0.0010640514316327954,
+        "auprc": 0.0003705192060874385,
+        "brier_score": 0.005252809514557075
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          -0.015518017382470878,
+          -0.002339779747515608
+        ],
+        "balanced_accuracy": [
+          -0.013416634598777363,
+          0.0013889722811425197
+        ],
+        "precision": [
+          -0.004809098022549496,
+          0.004557021514378152
+        ],
+        "recall": [
+          -0.01997656001907819,
+          -0.004519392273629572
+        ],
+        "specificity": [
+          -0.0127795527156549,
+          0.012861736334405127
+        ],
+        "f1": [
+          -0.010906323213006728,
+          -0.0016293276538579947
+        ],
+        "roc_auc": [
+          -0.00047279767918544655,
+          0.0028902704862176993
+        ],
+        "auprc": [
+          -0.00020525180313425983,
+          0.0010737835640981677
+        ],
+        "brier_score": [
+          0.0022162503712411697,
+          0.008606701519466927
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__JT__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT__s44__Kermany-FG__test__predictions.csv"
+      ]
+    },
+    {
+      "candidate_recipe": "JT",
+      "baseline_recipe": "ERM",
+      "dataset": "RSNA-1707",
+      "model": "DenseNet121",
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "baseline_ensemble": {
+        "accuracy": 0.667420814479638,
+        "balanced_accuracy": 0.6591230406720623,
+        "precision": 0.611731843575419,
+        "recall": 0.9647577092511013,
+        "specificity": 0.35348837209302325,
+        "f1": 0.7487179487179488,
+        "roc_auc": 0.8151623809035959,
+        "auprc": 0.8036194820296241,
+        "brier_score": 0.29194965972578474
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.7805429864253394,
+        "balanced_accuracy": 0.7813031451695522,
+        "precision": 0.8066037735849056,
+        "recall": 0.7533039647577092,
+        "specificity": 0.8093023255813954,
+        "f1": 0.7790432801822322,
+        "roc_auc": 0.8622067411125909,
+        "auprc": 0.8688987080923807,
+        "brier_score": 0.15908276780026884
+      },
+      "candidate_minus_baseline": {
+        "accuracy": 0.1131221719457014,
+        "balanced_accuracy": 0.12218010449748995,
+        "precision": 0.19487193000948666,
+        "recall": -0.21145374449339205,
+        "specificity": 0.4558139534883721,
+        "f1": 0.0303253314642834,
+        "roc_auc": 0.04704436020899494,
+        "auprc": 0.0652792260627566,
+        "brier_score": -0.1328668919255159
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          0.06108597285067874,
+          0.16515837104072406
+        ],
+        "balanced_accuracy": [
+          0.08023941970491777,
+          0.16384008152210336
+        ],
+        "precision": [
+          0.1507781517435756,
+          0.2391692948842773
+        ],
+        "recall": [
+          -0.2649572649572649,
+          -0.15899087758363725
+        ],
+        "specificity": [
+          0.39012887234130084,
+          0.5227344047166221
+        ],
+        "f1": [
+          -0.014466442859943158,
+          0.07424818493994115
+        ],
+        "roc_auc": [
+          0.01931101389137975,
+          0.074526027069254
+        ],
+        "auprc": [
+          0.023431233462389126,
+          0.10931390521828714
+        ],
+        "brier_score": [
+          -0.17402297590767965,
+          -0.09174397743246823
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__JT__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT__s44__RSNA-1707__test__predictions.csv"
+      ]
+    },
+    {
+      "candidate_recipe": "JT-DBS",
+      "baseline_recipe": "ERM",
+      "dataset": "Kermany-FG",
+      "model": "DenseNet121",
+      "sample_count": 1170,
+      "bootstrap_group_count": 624,
+      "baseline_ensemble": {
+        "accuracy": 0.9803418803418803,
+        "balanced_accuracy": 0.9764829751770938,
+        "precision": 0.9882766705744431,
+        "recall": 0.9848130841121495,
+        "specificity": 0.9681528662420382,
+        "f1": 0.986541837331773,
+        "roc_auc": 0.994523483540687,
+        "auprc": 0.997889827071855,
+        "brier_score": 0.017545187700722945
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.9726495726495726,
+        "balanced_accuracy": 0.967192987677838,
+        "precision": 0.9835680751173709,
+        "recall": 0.9789719626168224,
+        "specificity": 0.9554140127388535,
+        "f1": 0.9812646370023419,
+        "roc_auc": 0.99261488779094,
+        "auprc": 0.9969566995801359,
+        "brier_score": 0.0255259719682132
+      },
+      "candidate_minus_baseline": {
+        "accuracy": -0.007692307692307665,
+        "balanced_accuracy": -0.009289987499255803,
+        "precision": -0.004708595457072251,
+        "recall": -0.005841121495327117,
+        "specificity": -0.01273885350318471,
+        "f1": -0.005277200329431131,
+        "roc_auc": -0.0019085957497469996,
+        "auprc": -0.0009331274917191434,
+        "brier_score": 0.007980784267490253
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          -0.014790593513848276,
+          -0.0008665323699985658
+        ],
+        "balanced_accuracy": [
+          -0.01904004957765318,
+          -0.000363616286621578
+        ],
+        "precision": [
+          -0.011325757370121444,
+          0.0011448512927694165
+        ],
+        "recall": [
+          -0.01308018630347528,
+          0.0011312537472520114
+        ],
+        "specificity": [
+          -0.030864197530864224,
+          0.0032575951118775388
+        ],
+        "f1": [
+          -0.010250292158459967,
+          -0.0005954399223140488
+        ],
+        "roc_auc": [
+          -0.0046441513635559675,
+          0.00032194301412626563
+        ],
+        "auprc": [
+          -0.0023290583522078997,
+          8.036414277408591e-05
+        ],
+        "brier_score": [
+          0.004686671339945098,
+          0.01117711841667593
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__JT-DBS__s42__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT-DBS__s43__Kermany-FG__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT-DBS__s44__Kermany-FG__test__predictions.csv"
+      ]
+    },
+    {
+      "candidate_recipe": "JT-DBS",
+      "baseline_recipe": "ERM",
+      "dataset": "RSNA-1707",
+      "model": "DenseNet121",
+      "sample_count": 442,
+      "bootstrap_group_count": 442,
+      "baseline_ensemble": {
+        "accuracy": 0.667420814479638,
+        "balanced_accuracy": 0.6591230406720623,
+        "precision": 0.611731843575419,
+        "recall": 0.9647577092511013,
+        "specificity": 0.35348837209302325,
+        "f1": 0.7487179487179488,
+        "roc_auc": 0.8151623809035959,
+        "auprc": 0.8036194820296241,
+        "brier_score": 0.29194965972578474
+      },
+      "candidate_ensemble": {
+        "accuracy": 0.7714932126696833,
+        "balanced_accuracy": 0.7722466960352423,
+        "precision": 0.7971698113207547,
+        "recall": 0.7444933920704846,
+        "specificity": 0.8,
+        "f1": 0.7699316628701595,
+        "roc_auc": 0.8607314824300789,
+        "auprc": 0.8708531988870343,
+        "brier_score": 0.15574986489355183
+      },
+      "candidate_minus_baseline": {
+        "accuracy": 0.10407239819004532,
+        "balanced_accuracy": 0.11312365536318003,
+        "precision": 0.18543796774533572,
+        "recall": -0.22026431718061668,
+        "specificity": 0.4465116279069768,
+        "f1": 0.021213714152210628,
+        "roc_auc": 0.04556910152648297,
+        "auprc": 0.0672337168574102,
+        "brier_score": -0.1361997948322329
+      },
+      "paired_group_bootstrap_95ci": {
+        "accuracy": [
+          0.05203619909502255,
+          0.1583710407239819
+        ],
+        "balanced_accuracy": [
+          0.07000938529804482,
+          0.15677805198440223
+        ],
+        "precision": [
+          0.14213291185725274,
+          0.23161023677656256
+        ],
+        "recall": [
+          -0.2761904761904761,
+          -0.16666666666666663
+        ],
+        "specificity": [
+          0.3783783783783784,
+          0.5137614678899083
+        ],
+        "f1": [
+          -0.02410731567869724,
+          0.06581183237047675
+        ],
+        "roc_auc": [
+          0.019710387157569533,
+          0.07236995824505553
+        ],
+        "auprc": [
+          0.024857060869918908,
+          0.10975013700056989
+        ],
+        "brier_score": [
+          -0.17564692842485743,
+          -0.09758189073288996
+        ]
+      },
+      "candidate_prediction_files": [
+        "results/CXRShift__DenseNet121__JT-DBS__s42__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT-DBS__s43__RSNA-1707__test__predictions.csv",
+        "results/CXRShift__DenseNet121__JT-DBS__s44__RSNA-1707__test__predictions.csv"
+      ]
+    }
+  ]
+}

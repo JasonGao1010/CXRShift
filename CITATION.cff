@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software or its published evidence, please cite it as below."
+title: "CXRShift: Auditing Cross-Source Generalization in Chest X-ray Classification"
+type: software
+authors:
+  - family-names: "Gao"
+    given-names: "Jinze"
+    alias: "JasonGao1010"
+repository-code: "https://github.com/JasonGao1010/CXRShift"
+license: MIT
