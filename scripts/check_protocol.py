@@ -30,7 +30,9 @@ def main() -> int:
     ):
         actual = set(protocol.get(field, {}))
         if actual != expected:
-            errors.append(f"{field}: expected {sorted(expected)}, found {sorted(actual)}")
+            errors.append(
+                f"{field}: expected {sorted(expected)}, found {sorted(actual)}"
+            )
 
     config_expectations = {
         "DenseNet121__ERM.yaml": ("DenseNet121", "ERM"),
@@ -51,7 +53,9 @@ def main() -> int:
         for recipe in EXPECTED_RECIPES
         for seed in protocol["seeds"]
     }
-    if len(run_ids) != len(EXPECTED_MODELS) * len(EXPECTED_RECIPES) * len(protocol["seeds"]):
+    if len(run_ids) != len(EXPECTED_MODELS) * len(EXPECTED_RECIPES) * len(
+        protocol["seeds"]
+    ):
         errors.append("run_id template produces collisions")
 
     if errors:
@@ -60,7 +64,9 @@ def main() -> int:
             print(f"- {error}")
         return 1
     print("CXRShift protocol: valid")
-    print(f"models={len(EXPECTED_MODELS)} recipes={len(EXPECTED_RECIPES)} datasets={len(EXPECTED_DATASETS)}")
+    print(
+        f"models={len(EXPECTED_MODELS)} recipes={len(EXPECTED_RECIPES)} datasets={len(EXPECTED_DATASETS)}"
+    )
     return 0
 
 

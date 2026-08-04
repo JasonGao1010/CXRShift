@@ -19,6 +19,7 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 from xray_pneumonia.protocol import Identity, artifact_name  # noqa: E402
+
 ENSEMBLE_SEEDS = (42, 43, 44)
 DECISION_THRESHOLD = 0.5
 BOOTSTRAP_SEED = 20260710
@@ -31,8 +32,17 @@ PREDICTION_PATTERNS = {
         "mixed_domain_balanced_predictions_{dataset}_{model}_seed{seed}.csv"
     ),
 }
-RECIPE_IDS = {"strict": "ERM", "robust": "ERM-Reg", "mixed_simple": "JT", "mixed_domain_balanced": "JT-DBS"}
-MODEL_NAMES = {"densenet121": "DenseNet121", "convnext_tiny": "ConvNeXt-Tiny", "vit_b16": "ViT-B/16"}
+RECIPE_IDS = {
+    "strict": "ERM",
+    "robust": "ERM-Reg",
+    "mixed_simple": "JT",
+    "mixed_domain_balanced": "JT-DBS",
+}
+MODEL_NAMES = {
+    "densenet121": "DenseNet121",
+    "convnext_tiny": "ConvNeXt-Tiny",
+    "vit_b16": "ViT-B/16",
+}
 DATASET_IDS = {"kermany_grouped": "Kermany-FG", "rsna": "RSNA-1707"}
 
 
@@ -89,9 +99,7 @@ def metrics(
     group_positive = np.add.reduceat(sorted_y, starts)
     group_negative = group_size - group_positive
     negative_before = np.cumsum(group_negative) - group_negative
-    auc_numerator = np.sum(
-        group_positive * (negative_before + 0.5 * group_negative)
-    )
+    auc_numerator = np.sum(group_positive * (negative_before + 0.5 * group_negative))
     roc_auc = float(auc_numerator / (n_positive * n_negative))
 
     # Average precision at the end of every tied-score block (sklearn's
@@ -238,7 +246,10 @@ def load_probability_ensemble(
         path = results_dir / name
         canonical = results_dir / artifact_name(
             Identity(MODEL_NAMES[model], RECIPE_IDS[family], seed),
-            DATASET_IDS[dataset], "test", "predictions", "csv",
+            DATASET_IDS[dataset],
+            "test",
+            "predictions",
+            "csv",
         )
         if canonical.is_file():
             path = canonical
@@ -311,7 +322,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    results = args.results_dir if args.results_dir.is_absolute() else PROJECT_ROOT / args.results_dir
+    results = (
+        args.results_dir
+        if args.results_dir.is_absolute()
+        else PROJECT_ROOT / args.results_dir
+    )
     models = ("densenet121", "convnext_tiny", "vit_b16")
     datasets = ("kermany_grouped", "rsna")
     rows_out: list[dict[str, Any]] = []
@@ -354,7 +369,9 @@ def main() -> int:
                 if args.require_complete:
                     raise
                 continue
-            groups = [filename_group_from_path(path, dataset) for path in loaded["paths"]]
+            groups = [
+                filename_group_from_path(path, dataset) for path in loaded["paths"]
+            ]
             ensemble = metrics(loaded["labels"], loaded["ensemble_score"])
             ci = bootstrap_ci(
                 loaded["labels"],
@@ -417,7 +434,9 @@ def main() -> int:
                 filename_group_from_path(path, dataset) for path in baseline["paths"]
             ]
             baseline_metrics = metrics(baseline["labels"], baseline["ensemble_score"])
-            candidate_metrics = metrics(candidate["labels"], candidate["ensemble_score"])
+            candidate_metrics = metrics(
+                candidate["labels"], candidate["ensemble_score"]
+            )
             differences = {
                 key: candidate_metrics[key] - baseline_metrics[key]
                 for key in baseline_metrics
@@ -460,8 +479,16 @@ def main() -> int:
                 "Incomplete comparison matrix: "
                 f"{len(payload['paired_comparisons'])}/{expected_comparisons} comparisons"
             )
-    output_json = args.output_json if args.output_json.is_absolute() else PROJECT_ROOT / args.output_json
-    output_csv = args.output_csv if args.output_csv.is_absolute() else PROJECT_ROOT / args.output_csv
+    output_json = (
+        args.output_json
+        if args.output_json.is_absolute()
+        else PROJECT_ROOT / args.output_json
+    )
+    output_csv = (
+        args.output_csv
+        if args.output_csv.is_absolute()
+        else PROJECT_ROOT / args.output_csv
+    )
     output_json.parent.mkdir(parents=True, exist_ok=True)
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     output_json.write_text(

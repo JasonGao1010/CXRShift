@@ -54,10 +54,11 @@ def test_label_matching_equalizes_each_label_stratum():
     matched = select_label_matched(rows)
 
     for label, expected in (("NORMAL", 2), ("PNEUMONIA", 3)):
-        assert sum(
-            row["source"] == "kermany" and row["label"] == label
-            for row in matched
-        ) == expected
-        assert sum(
-            row["source"] == "rsna" and row["label"] == label for row in matched
-        ) == expected
+        assert (
+            sum(row["source"] == "kermany" and row["label"] == label for row in matched)
+            == expected
+        )
+        assert (
+            sum(row["source"] == "rsna" and row["label"] == label for row in matched)
+            == expected
+        )

@@ -57,8 +57,7 @@ def test_rsna_member_manifest_and_hash(tmp_path: Path):
     image.write_bytes(b"fixed official bytes")
     manifest = tmp_path / "members.csv"
     manifest.write_text(
-        "patientId,target,split,source_sha256\n"
-        f"p1,1,test,{file_sha256(image)}\n",
+        f"patientId,target,split,source_sha256\np1,1,test,{file_sha256(image)}\n",
         encoding="utf-8",
     )
     rows = read_member_manifest(manifest)
@@ -69,9 +68,7 @@ def test_rsna_member_manifest_and_hash(tmp_path: Path):
 def test_rsna_member_manifest_rejects_duplicates(tmp_path: Path):
     manifest = tmp_path / "members.csv"
     manifest.write_text(
-        "patientId,target,split,source_sha256\n"
-        "p1,1,test,abc\n"
-        "p1,1,test,abc\n",
+        "patientId,target,split,source_sha256\np1,1,test,abc\np1,1,test,abc\n",
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="Duplicate"):

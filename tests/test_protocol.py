@@ -1,4 +1,9 @@
-from xray_pneumonia.protocol import Identity, artifact_name, legacy_family, load_protocol
+from xray_pneumonia.protocol import (
+    Identity,
+    artifact_name,
+    legacy_family,
+    load_protocol,
+)
 
 
 def test_final_protocol_has_stable_unversioned_names():

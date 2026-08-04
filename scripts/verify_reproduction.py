@@ -40,15 +40,26 @@ def parse_args() -> argparse.Namespace:
 
 def keyed_groups(payload: dict[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
     datasets = {"kermany_grouped": "Kermany-FG", "rsna": "RSNA-1707"}
-    models = {"densenet121": "DenseNet121", "convnext_tiny": "ConvNeXt-Tiny", "vit_b16": "ViT-B/16"}
+    models = {
+        "densenet121": "DenseNet121",
+        "convnext_tiny": "ConvNeXt-Tiny",
+        "vit_b16": "ViT-B/16",
+    }
     return {
-        (datasets.get(row["dataset"], row["dataset"]), models.get(row["model"], row["model"])): row
+        (
+            datasets.get(row["dataset"], row["dataset"]),
+            models.get(row["model"], row["model"]),
+        ): row
         for row in payload["groups"]
     }
 
 
 def keyed_comparisons(payload: dict[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
-    recipes = {"robust": "ERM-Reg", "mixed_simple": "JT", "mixed_domain_balanced": "JT-DBS"}
+    recipes = {
+        "robust": "ERM-Reg",
+        "mixed_simple": "JT",
+        "mixed_domain_balanced": "JT-DBS",
+    }
     datasets = {"kermany_grouped": "Kermany-FG", "rsna": "RSNA-1707"}
     return {
         (
@@ -62,7 +73,9 @@ def keyed_comparisons(payload: dict[str, Any]) -> dict[tuple[str, str], dict[str
 def main() -> int:
     args = parse_args()
     work = args.work_dir if args.work_dir.is_absolute() else ROOT / args.work_dir
-    reference_path = args.reference if args.reference.is_absolute() else ROOT / args.reference
+    reference_path = (
+        args.reference if args.reference.is_absolute() else ROOT / args.reference
+    )
     rebuilt = load(work / "results/CXRShift__main-summary.json")
     reference = load(reference_path)
     kermany = load(work / "audit/kermany_grouped_summary.json")
@@ -71,7 +84,11 @@ def main() -> int:
 
     if kermany.get("total_images") != 5856 or not kermany.get("ok"):
         failures.append("Kermany identity gate failed")
-    if rsna.get("sample_count") != 1707 or rsna.get("hash_mismatches") or rsna.get("missing_images"):
+    if (
+        rsna.get("sample_count") != 1707
+        or rsna.get("hash_mismatches")
+        or rsna.get("missing_images")
+    ):
         failures.append("RSNA 1707-member identity gate failed")
     integrity = load(work / "audit/integrity.json")
     if not integrity.get("ok"):
@@ -91,11 +108,24 @@ def main() -> int:
             new = float(new_groups[key]["ensemble"][metric])
             old = float(old_groups[key]["ensemble"][metric])
             difference = relative_difference(new, old)
-            comparisons.append({"group": list(key), "metric": metric, "reference": old, "rebuilt": new, "relative_difference": difference})
+            comparisons.append(
+                {
+                    "group": list(key),
+                    "metric": metric,
+                    "reference": old,
+                    "rebuilt": new,
+                    "relative_difference": difference,
+                }
+            )
             if difference >= args.tolerance:
-                failures.append(f"Metric outside tolerance: {key}/{metric} ({difference:.4%})")
+                failures.append(
+                    f"Metric outside tolerance: {key}/{metric} ({difference:.4%})"
+                )
 
-    new_candidates, old_candidates = keyed_comparisons(rebuilt), keyed_comparisons(reference)
+    new_candidates, old_candidates = (
+        keyed_comparisons(rebuilt),
+        keyed_comparisons(reference),
+    )
     if set(new_candidates) != set(old_candidates) or len(new_candidates) != 6:
         failures.append("Candidate comparison matrix is incomplete or unexpected")
     for key in sorted(set(new_candidates) & set(old_candidates)):
@@ -106,13 +136,26 @@ def main() -> int:
             new = float(new_candidates[key]["candidate_ensemble"][metric])
             old = float(old_candidates[key]["candidate_ensemble"][metric])
             difference = relative_difference(new, old)
-            comparisons.append({"group": list(key), "metric": metric, "reference": old, "rebuilt": new, "relative_difference": difference})
+            comparisons.append(
+                {
+                    "group": list(key),
+                    "metric": metric,
+                    "reference": old,
+                    "rebuilt": new,
+                    "relative_difference": difference,
+                }
+            )
             if difference >= args.tolerance:
-                failures.append(f"Candidate metric outside tolerance: {key}/{metric} ({difference:.4%})")
+                failures.append(
+                    f"Candidate metric outside tolerance: {key}/{metric} ({difference:.4%})"
+                )
 
     report = {
         "status": "VERIFIED" if not failures else "FAILED",
-        "data_identity": {"kermany_images": kermany.get("total_images"), "rsna_members": rsna.get("sample_count")},
+        "data_identity": {
+            "kermany_images": kermany.get("total_images"),
+            "rsna_members": rsna.get("sample_count"),
+        },
         "metric_tolerance": args.tolerance,
         "integrity_audit": integrity.get("ok"),
         "metric_comparisons": comparisons,

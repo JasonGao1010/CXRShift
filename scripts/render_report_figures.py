@@ -27,9 +27,7 @@ def load_summary(path: Path) -> dict[str, Any]:
 
 def canonical_dataset(value: str) -> str:
     """Normalize the two legacy dataset tokens retained for compatibility."""
-    return {"kermany_grouped": "Kermany-FG", "rsna": "RSNA-1707"}.get(
-        value, value
-    )
+    return {"kermany_grouped": "Kermany-FG", "rsna": "RSNA-1707"}.get(value, value)
 
 
 def canonical_strategy(row: dict[str, Any]) -> str:
@@ -61,13 +59,14 @@ def add_value_labels(axis: Any, bars: Any) -> None:
 def render(summary: dict[str, Any], output: Path) -> None:
     """Render baseline source shift and DenseNet strategy comparisons."""
     baseline = {
-        (canonical_dataset(row["dataset"]), row["model"]):
-        row["ensemble"]["balanced_accuracy"] * 100
+        (canonical_dataset(row["dataset"]), row["model"]): row["ensemble"][
+            "balanced_accuracy"
+        ]
+        * 100
         for row in summary["groups"]
     }
     strategies = {
-        ("ERM", dataset): baseline[(dataset, "DenseNet121")]
-        for dataset in COLORS
+        ("ERM", dataset): baseline[(dataset, "DenseNet121")] for dataset in COLORS
     }
     for row in summary["paired_comparisons"]:
         dataset = canonical_dataset(row["dataset"])

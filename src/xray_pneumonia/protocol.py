@@ -38,7 +38,9 @@ class Identity:
         )
 
 
-def artifact_name(identity: Identity, dataset: str, split: str, artifact: str, extension: str) -> str:
+def artifact_name(
+    identity: Identity, dataset: str, split: str, artifact: str, extension: str
+) -> str:
     protocol = load_protocol()
     if dataset not in protocol["datasets"]:
         raise KeyError(f"Unknown dataset identity: {dataset}")

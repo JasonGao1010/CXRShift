@@ -42,12 +42,16 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def load_checkpoint(torch_module: Any, checkpoint_path: Path) -> dict[str, Any]:
     try:
-        return torch_module.load(checkpoint_path, map_location="cpu", weights_only=False)
+        return torch_module.load(
+            checkpoint_path, map_location="cpu", weights_only=False
+        )
     except TypeError:
         return torch_module.load(checkpoint_path, map_location="cpu")
 
@@ -122,7 +126,9 @@ def build_eval_transform(settings: dict[str, Any], transforms_module: Any):
     return transforms_module.Compose(steps)
 
 
-def load_samples_csv(path: Path, data_root: Path, class_names: tuple[str, ...]) -> list[tuple[Path, int]]:
+def load_samples_csv(
+    path: Path, data_root: Path, class_names: tuple[str, ...]
+) -> list[tuple[Path, int]]:
     class_to_idx = {class_name: index for index, class_name in enumerate(class_names)}
     samples: list[tuple[Path, int]] = []
     with path.open("r", newline="", encoding="utf-8") as handle:
@@ -130,7 +136,9 @@ def load_samples_csv(path: Path, data_root: Path, class_names: tuple[str, ...]) 
         required = {"path", "true_label"}
         missing = required.difference(reader.fieldnames or [])
         if missing:
-            raise ValueError(f"Missing required sample columns in {path}: {sorted(missing)}")
+            raise ValueError(
+                f"Missing required sample columns in {path}: {sorted(missing)}"
+            )
         for row in reader:
             label = str(row["true_label"])
             if label not in class_to_idx:
@@ -169,23 +177,35 @@ def compute_metrics(
     )
 
     positive_label = min(1, len(class_names) - 1)
-    matrix = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names)))).tolist()
+    matrix = confusion_matrix(
+        y_true, y_pred, labels=list(range(len(class_names)))
+    ).tolist()
     tn = fp = fn = tp = 0
-    if len(class_names) == 2 and len(matrix) == 2 and all(len(row) == 2 for row in matrix):
+    if (
+        len(class_names) == 2
+        and len(matrix) == 2
+        and all(len(row) == 2 for row in matrix)
+    ):
         tn, fp = matrix[0]
         fn, tp = matrix[1]
     specificity = float(tn / (tn + fp)) if (tn + fp) else 0.0
-    recall = float(recall_score(y_true, y_pred, pos_label=positive_label, zero_division=0))
+    recall = float(
+        recall_score(y_true, y_pred, pos_label=positive_label, zero_division=0)
+    )
     labels_binary = [1 if item == positive_label else 0 for item in y_true]
     brier_score = float(brier_score_loss(labels_binary, positive_scores))
     ece = expected_calibration_error(labels_binary, positive_scores)
 
     metrics: dict[str, Any] = {
         "accuracy": float(accuracy_score(y_true, y_pred)),
-        "precision": float(precision_score(y_true, y_pred, pos_label=positive_label, zero_division=0)),
+        "precision": float(
+            precision_score(y_true, y_pred, pos_label=positive_label, zero_division=0)
+        ),
         "recall": recall,
         "specificity": specificity,
-        "f1": float(f1_score(y_true, y_pred, pos_label=positive_label, zero_division=0)),
+        "f1": float(
+            f1_score(y_true, y_pred, pos_label=positive_label, zero_division=0)
+        ),
         "balanced_accuracy": (recall + specificity) / 2,
         "false_positive_rate": float(fp / (tn + fp)) if (tn + fp) else 0.0,
         "false_negative_rate": float(fn / (fn + tp)) if (fn + tp) else 0.0,
@@ -255,10 +275,14 @@ def create_classifier_model(
 
         return convnext_tiny(weights=None, num_classes=num_classes)
 
-    return timm_module.create_model(model_name, pretrained=False, num_classes=num_classes)
+    return timm_module.create_model(
+        model_name, pretrained=False, num_classes=num_classes
+    )
 
 
-def write_predictions(path: Path, rows: list[dict[str, Any]], class_names: tuple[str, ...]) -> None:
+def write_predictions(
+    path: Path, rows: list[dict[str, Any]], class_names: tuple[str, ...]
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
         "path",
@@ -272,7 +296,9 @@ def write_predictions(path: Path, rows: list[dict[str, Any]], class_names: tuple
         writer.writerows(rows)
 
 
-def write_confusion_matrix(path: Path, matrix: list[list[int]], class_names: tuple[str, ...]) -> None:
+def write_confusion_matrix(
+    path: Path, matrix: list[list[int]], class_names: tuple[str, ...]
+) -> None:
     import matplotlib as mpl
 
     configure_report_figure_typography(mpl)
@@ -307,18 +333,28 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     from torch.utils.data import DataLoader
     from torchvision import transforms
 
-    checkpoint_path = resolve_project_path(args.checkpoint) if args.checkpoint else latest_checkpoint_from_training_summary(
-        resolve_project_path(args.training_summary)
+    checkpoint_path = (
+        resolve_project_path(args.checkpoint)
+        if args.checkpoint
+        else latest_checkpoint_from_training_summary(
+            resolve_project_path(args.training_summary)
+        )
     )
     checkpoint = load_checkpoint(torch, checkpoint_path)
     settings = dict(checkpoint.get("settings") or {})
-    class_names = tuple(checkpoint.get("classes") or settings.get("classes") or DEFAULT_CLASSES)
+    class_names = tuple(
+        checkpoint.get("classes") or settings.get("classes") or DEFAULT_CLASSES
+    )
     if len(class_names) != 2 or "PNEUMONIA" not in class_names:
         raise ValueError("Evaluation requires exactly two classes including PNEUMONIA")
-    data_root = resolve_project_path(args.data_root or settings.get("data_root", "data/raw/chest_xray"))
+    data_root = resolve_project_path(
+        args.data_root or settings.get("data_root", "data/raw/chest_xray")
+    )
 
     device = choose_device(args.device, torch)
-    samples_csv = resolve_project_path(args.samples_csv) if args.samples_csv is not None else None
+    samples_csv = (
+        resolve_project_path(args.samples_csv) if args.samples_csv is not None else None
+    )
     dataset: Any
     if samples_csv is not None:
         explicit_samples = load_samples_csv(samples_csv, data_root, class_names)
@@ -336,9 +372,13 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             "sample_count": len(dataset),
         }
     else:
-        validation = validate_dataset_layout(data_root, class_names=class_names, splits=(args.split,))
+        validation = validate_dataset_layout(
+            data_root, class_names=class_names, splits=(args.split,)
+        )
         if not validation.ok:
-            raise RuntimeError(f"Dataset validation failed for split {args.split}: {validation.to_dict()}")
+            raise RuntimeError(
+                f"Dataset validation failed for split {args.split}: {validation.to_dict()}"
+            )
         dataset = XRayImageDataset(
             data_root,
             args.split,
@@ -377,7 +417,9 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
             labels_cpu = labels.cpu().tolist()
             predictions_cpu = predictions.cpu().tolist()
             probabilities_cpu = probabilities.cpu().tolist()
-            for label, prediction, probs in zip(labels_cpu, predictions_cpu, probabilities_cpu):
+            for label, prediction, probs in zip(
+                labels_cpu, predictions_cpu, probabilities_cpu
+            ):
                 image_path, _ = dataset.samples[sample_index]
                 row = {
                     "path": image_path.relative_to(data_root).as_posix(),
@@ -398,12 +440,15 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
 
     metrics = compute_metrics(y_true, y_pred, positive_scores, class_names)
     run_id = checkpoint_path.parent.name or timestamp()
-    json_output = resolve_project_path(args.json_output or f"results/eval_{args.split}_{run_id}.json")
+    json_output = resolve_project_path(
+        args.json_output or f"results/eval_{args.split}_{run_id}.json"
+    )
     predictions_output = resolve_project_path(
         args.predictions_output or f"results/predictions_{args.split}_{run_id}.csv"
     )
     confusion_matrix_output = resolve_project_path(
-        args.confusion_matrix_output or f"figures/confusion_matrix_{args.split}_{run_id}.png"
+        args.confusion_matrix_output
+        or f"figures/confusion_matrix_{args.split}_{run_id}.png"
     )
 
     report = {
@@ -420,7 +465,9 @@ def evaluate(args: argparse.Namespace) -> dict[str, Any]:
         "confusion_matrix_output": confusion_matrix_output.as_posix(),
     }
     write_predictions(predictions_output, prediction_rows, class_names)
-    write_confusion_matrix(confusion_matrix_output, metrics["confusion_matrix"], class_names)
+    write_confusion_matrix(
+        confusion_matrix_output, metrics["confusion_matrix"], class_names
+    )
     write_json(json_output, report)
     if not args.no_update_latest:
         write_json(PROJECT_ROOT / "results" / "evaluation_latest.json", report)

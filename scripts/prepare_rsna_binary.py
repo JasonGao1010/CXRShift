@@ -26,7 +26,9 @@ def resolve_project_path(path: Path | str) -> Path:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def read_label_rows(labels_csv: Path) -> dict[str, dict[str, Any]]:
@@ -36,7 +38,9 @@ def read_label_rows(labels_csv: Path) -> dict[str, dict[str, Any]]:
         required = {"patientId", "Target"}
         missing = required.difference(reader.fieldnames or [])
         if missing:
-            raise ValueError(f"Missing required columns in {labels_csv}: {sorted(missing)}")
+            raise ValueError(
+                f"Missing required columns in {labels_csv}: {sorted(missing)}"
+            )
         for row in reader:
             patient_id = str(row["patientId"])
             target = int(float(row["Target"]))
@@ -160,7 +164,9 @@ def write_metadata(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def write_sample_manifests(output_root: Path, metadata_rows: list[dict[str, Any]]) -> None:
+def write_sample_manifests(
+    output_root: Path, metadata_rows: list[dict[str, Any]]
+) -> None:
     for split in ("train", "val", "test"):
         path = output_root / f"samples_{split}.csv"
         with path.open("w", newline="", encoding="utf-8") as handle:
@@ -168,7 +174,9 @@ def write_sample_manifests(output_root: Path, metadata_rows: list[dict[str, Any]
             writer.writeheader()
             for row in metadata_rows:
                 if row["split"] == split:
-                    writer.writerow({"path": row["image_path"], "true_label": row["binary_label"]})
+                    writer.writerow(
+                        {"path": row["image_path"], "true_label": row["binary_label"]}
+                    )
 
 
 def write_distribution_figure(path: Path, counts: dict[str, dict[str, int]]) -> None:
@@ -192,15 +200,31 @@ def write_distribution_figure(path: Path, counts: dict[str, dict[str, int]]) -> 
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Convert RSNA challenge files into a binary dataset.")
-    parser.add_argument("--raw-root", type=Path, default=Path("data/raw/rsna_pneumonia"))
+    parser = argparse.ArgumentParser(
+        description="Convert RSNA challenge files into a binary dataset."
+    )
+    parser.add_argument(
+        "--raw-root", type=Path, default=Path("data/raw/rsna_pneumonia")
+    )
     parser.add_argument("--images-dir", type=Path, default=None)
     parser.add_argument("--labels-csv", type=Path, default=None)
     parser.add_argument("--class-info-csv", type=Path, default=None)
-    parser.add_argument("--output-root", type=Path, default=Path("data/processed/rsna_binary"))
-    parser.add_argument("--splits-output", type=Path, default=Path("data/splits/rsna_binary_seed42.json"))
-    parser.add_argument("--summary-output", type=Path, default=Path("results/rsna_dataset_summary.json"))
-    parser.add_argument("--figure-output", type=Path, default=Path("figures/rsna_class_distribution.png"))
+    parser.add_argument(
+        "--output-root", type=Path, default=Path("data/processed/rsna_binary")
+    )
+    parser.add_argument(
+        "--splits-output",
+        type=Path,
+        default=Path("data/splits/rsna_binary_seed42.json"),
+    )
+    parser.add_argument(
+        "--summary-output", type=Path, default=Path("results/rsna_dataset_summary.json")
+    )
+    parser.add_argument(
+        "--figure-output",
+        type=Path,
+        default=Path("figures/rsna_class_distribution.png"),
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--train-fraction", type=float, default=0.70)
     parser.add_argument("--val-fraction", type=float, default=0.10)
@@ -247,7 +271,9 @@ def read_member_manifest(path: Path) -> dict[str, dict[str, str]]:
         for row in reader:
             patient_id = str(row["patientId"])
             if patient_id in rows:
-                raise ValueError(f"Duplicate patientId in member manifest: {patient_id}")
+                raise ValueError(
+                    f"Duplicate patientId in member manifest: {patient_id}"
+                )
             if row["split"] not in {"train", "val", "test"}:
                 raise ValueError(f"Invalid split for {patient_id}: {row['split']}")
             rows[patient_id] = {key: str(value) for key, value in row.items()}
@@ -274,12 +300,24 @@ def prepare_output_paths(paths: list[Path], *, force: bool) -> None:
 
 def main() -> int:
     args = parse_args()
-    if args.train_fraction <= 0 or args.val_fraction <= 0 or args.train_fraction + args.val_fraction >= 1:
-        raise ValueError("fractions must be positive and leave a non-empty test fraction")
+    if (
+        args.train_fraction <= 0
+        or args.val_fraction <= 0
+        or args.train_fraction + args.val_fraction >= 1
+    ):
+        raise ValueError(
+            "fractions must be positive and leave a non-empty test fraction"
+        )
     raw_root = resolve_project_path(args.raw_root)
-    images_dir = resolve_project_path(args.images_dir or raw_root / "stage_2_train_images")
-    labels_csv = resolve_project_path(args.labels_csv or raw_root / "stage_2_train_labels.csv")
-    class_info_csv = resolve_project_path(args.class_info_csv or raw_root / "stage_2_detailed_class_info.csv")
+    images_dir = resolve_project_path(
+        args.images_dir or raw_root / "stage_2_train_images"
+    )
+    labels_csv = resolve_project_path(
+        args.labels_csv or raw_root / "stage_2_train_labels.csv"
+    )
+    class_info_csv = resolve_project_path(
+        args.class_info_csv or raw_root / "stage_2_detailed_class_info.csv"
+    )
     member_manifest_path = (
         resolve_project_path(args.member_manifest) if args.member_manifest else None
     )
@@ -298,7 +336,9 @@ def main() -> int:
         resolved_output.is_relative_to(root) or root.is_relative_to(resolved_output)
         for root in protected_roots
     ):
-        raise ValueError("--output-root must not overlap the project, raw-data, or image roots")
+        raise ValueError(
+            "--output-root must not overlap the project, raw-data, or image roots"
+        )
     if not args.dry_run:
         prepare_output_paths(
             [output_root, splits_output, summary_output, figure_output],
@@ -316,7 +356,9 @@ def main() -> int:
     if member_manifest is not None:
         unknown = sorted(set(member_manifest).difference(labels))
         if unknown:
-            raise ValueError(f"Manifest patientIds missing from labels CSV: {unknown[:5]}")
+            raise ValueError(
+                f"Manifest patientIds missing from labels CSV: {unknown[:5]}"
+            )
         label_mismatches = [
             patient_id
             for patient_id, row in member_manifest.items()
@@ -336,7 +378,11 @@ def main() -> int:
             seed=args.seed,
         )
     if args.available_only and member_manifest is None:
-        labels = {patient_id: row for patient_id, row in labels.items() if patient_id in image_index}
+        labels = {
+            patient_id: row
+            for patient_id, row in labels.items()
+            if patient_id in image_index
+        }
 
     class_limits = {"NORMAL": 0, "PNEUMONIA": 0}
     metadata_rows: list[dict[str, Any]] = []
@@ -346,7 +392,10 @@ def main() -> int:
     missing_images: list[str] = []
     for patient_id, row in sorted(labels.items()):
         binary_label = "PNEUMONIA" if int(row["target"]) == 1 else "NORMAL"
-        if args.limit_per_class is not None and class_limits[binary_label] >= args.limit_per_class:
+        if (
+            args.limit_per_class is not None
+            and class_limits[binary_label] >= args.limit_per_class
+        ):
             continue
         source = image_index.get(patient_id, images_dir / f"{patient_id}.dcm")
         if not source.exists():
@@ -405,7 +454,9 @@ def main() -> int:
         "label_patient_count": len(labels),
         "available_image_count": len(image_index),
         "available_only": bool(args.available_only),
-        "member_manifest": member_manifest_path.as_posix() if member_manifest_path else None,
+        "member_manifest": member_manifest_path.as_posix()
+        if member_manifest_path
+        else None,
         "member_manifest_count": len(member_manifest) if member_manifest else None,
         "hash_mismatches": hash_mismatches,
         "counts": counts,

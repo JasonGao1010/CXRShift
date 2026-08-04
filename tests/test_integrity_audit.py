@@ -46,9 +46,7 @@ def test_kermany_bare_token_collision_is_flagged_without_patient_claim(tmp_path)
     assert comparison["cross_subtype_count"] == 1
     assert filename_group_id(
         Path("person7_bacteria_1.jpeg"), "PNEUMONIA", "kermany"
-    ) != filename_group_id(
-        Path("person7_virus_1.jpeg"), "PNEUMONIA", "kermany"
-    )
+    ) != filename_group_id(Path("person7_virus_1.jpeg"), "PNEUMONIA", "kermany")
 
 
 def test_nih_audit_uses_eight_digit_patient_id_across_labels(tmp_path):

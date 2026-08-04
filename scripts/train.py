@@ -184,7 +184,9 @@ def model_status(settings: TrainSettings) -> dict[str, Any]:
     try:
         import timm
 
-        timm.create_model(settings.model, pretrained=False, num_classes=len(settings.classes))
+        timm.create_model(
+            settings.model, pretrained=False, num_classes=len(settings.classes)
+        )
         has_pretrained = settings.model in timm.list_models(pretrained=True)
     except Exception as exc:
         return {
@@ -306,7 +308,9 @@ def to_jsonable_settings(settings: TrainSettings) -> dict[str, Any]:
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -418,24 +422,32 @@ def parse_args() -> argparse.Namespace:
 
     pretrained_group = parser.add_mutually_exclusive_group()
     pretrained_group.add_argument("--pretrained", action="store_true", default=None)
-    pretrained_group.add_argument("--no-pretrained", action="store_false", dest="pretrained")
+    pretrained_group.add_argument(
+        "--no-pretrained", action="store_false", dest="pretrained"
+    )
 
     amp_group = parser.add_mutually_exclusive_group()
     amp_group.add_argument("--mixed-precision", action="store_true", default=None)
-    amp_group.add_argument("--no-mixed-precision", action="store_false", dest="mixed_precision")
+    amp_group.add_argument(
+        "--no-mixed-precision", action="store_false", dest="mixed_precision"
+    )
     weights_group = parser.add_mutually_exclusive_group()
     weights_group.add_argument("--class-weights", action="store_true", default=None)
-    weights_group.add_argument("--no-class-weights", action="store_false", dest="class_weights")
+    weights_group.add_argument(
+        "--no-class-weights", action="store_false", dest="class_weights"
+    )
     return parser.parse_args()
 
 
 def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSettings:
     classes = tuple(nested_get(config, "project", "classes", default=DEFAULT_CLASSES))
     data_root = resolve_project_path(
-        args.data_root or nested_get(config, "paths", "data_root", default="data/raw/chest_xray")
+        args.data_root
+        or nested_get(config, "paths", "data_root", default="data/raw/chest_xray")
     )
     results_dir = resolve_project_path(
-        args.results_dir or nested_get(config, "paths", "results_dir", default="results")
+        args.results_dir
+        or nested_get(config, "paths", "results_dir", default="results")
     )
     checkpoints_dir = resolve_project_path(
         args.checkpoints_dir
@@ -444,7 +456,9 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
     augment = dict(nested_get(config, "data", "augment", default={}))
 
     epochs = int(args.epochs or nested_get(config, "training", "epochs", default=10))
-    batch_size = int(args.batch_size or nested_get(config, "training", "batch_size", default=32))
+    batch_size = int(
+        args.batch_size or nested_get(config, "training", "batch_size", default=32)
+    )
     max_train_batches = args.max_train_batches
     max_val_batches = args.max_val_batches
     if args.smoke_test:
@@ -461,7 +475,9 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
     if args.mixed_precision is not None:
         mixed_precision = args.mixed_precision
 
-    use_class_weights = nested_get(config, "training", "use_class_weights", default=True)
+    use_class_weights = nested_get(
+        config, "training", "use_class_weights", default=True
+    )
     if args.class_weights is not None:
         use_class_weights = args.class_weights
 
@@ -472,20 +488,26 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
         val_split=str(nested_get(config, "data", "val_split", default="val")),
         results_dir=results_dir,
         checkpoints_dir=checkpoints_dir,
-        image_size=int(args.image_size or nested_get(config, "data", "image_size", default=224)),
+        image_size=int(
+            args.image_size or nested_get(config, "data", "image_size", default=224)
+        ),
         normalize=str(nested_get(config, "data", "normalize", default="imagenet")),
         model=str(
             args.model
-            or nested_get(config, "training", "model", default="tf_efficientnetv2_s.in1k")
+            or nested_get(
+                config, "training", "model", default="tf_efficientnetv2_s.in1k"
+            )
         ),
         pretrained=bool(pretrained),
         epochs=epochs,
         batch_size=batch_size,
         learning_rate=float(
-            args.learning_rate or nested_get(config, "training", "learning_rate", default=0.0003)
+            args.learning_rate
+            or nested_get(config, "training", "learning_rate", default=0.0003)
         ),
         weight_decay=float(
-            args.weight_decay or nested_get(config, "training", "weight_decay", default=0.0001)
+            args.weight_decay
+            or nested_get(config, "training", "weight_decay", default=0.0001)
         ),
         optimizer=str(nested_get(config, "training", "optimizer", default="adamw")),
         scheduler=str(nested_get(config, "training", "scheduler", default="cosine")),
@@ -507,7 +529,11 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
         smoke_test=bool(args.smoke_test),
         augment=augment,
         train_holdout_fraction=float(args.train_holdout_fraction or 0.0),
-        holdout_seed=int(args.holdout_seed if args.holdout_seed is not None else nested_get(config, "training", "seed", default=42)),
+        holdout_seed=int(
+            args.holdout_seed
+            if args.holdout_seed is not None
+            else nested_get(config, "training", "seed", default=42)
+        ),
         holdout_manifest_output=(
             resolve_project_path(args.holdout_manifest_output)
             if args.holdout_manifest_output is not None
@@ -543,8 +569,7 @@ def readiness_report(settings: TrainSettings) -> dict[str, Any]:
     missing = [name for name, available in deps.items() if not available]
     model = model_status(settings)
     checkpoint_ok = (
-        settings.init_checkpoint is None
-        or settings.init_checkpoint.is_file()
+        settings.init_checkpoint is None or settings.init_checkpoint.is_file()
     )
     return {
         "ok": validation.ok and not missing and model["ok"] and checkpoint_ok,
@@ -590,7 +615,9 @@ def print_readiness(report: dict[str, Any]) -> None:
 
 def load_checkpoint(torch_module: Any, checkpoint_path: Path) -> dict[str, Any]:
     try:
-        return torch_module.load(checkpoint_path, map_location="cpu", weights_only=False)
+        return torch_module.load(
+            checkpoint_path, map_location="cpu", weights_only=False
+        )
     except TypeError:
         return torch_module.load(checkpoint_path, map_location="cpu")
 
@@ -634,7 +661,9 @@ def build_transforms(settings: TrainSettings, transforms_module: Any, train: boo
     """Build deterministic evaluation transforms and configured train augmentation."""
     steps: list[Any] = []
     if train:
-        steps.append(transforms_module.Resize((settings.image_size, settings.image_size)))
+        steps.append(
+            transforms_module.Resize((settings.image_size, settings.image_size))
+        )
         if settings.augment.get("horizontal_flip", False):
             steps.append(transforms_module.RandomHorizontalFlip())
         rotation = float(settings.augment.get("random_rotation_degrees", 0) or 0)
@@ -650,7 +679,9 @@ def build_transforms(settings: TrainSettings, transforms_module: Any, train: boo
                 )
             )
     else:
-        steps.append(transforms_module.Resize((settings.image_size, settings.image_size)))
+        steps.append(
+            transforms_module.Resize((settings.image_size, settings.image_size))
+        )
 
     steps.append(transforms_module.ToTensor())
     if settings.normalize.lower() == "imagenet":
@@ -720,7 +751,9 @@ def write_holdout_manifest(
     """Record the exact holdout membership using paths relative to the dataset."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["path", "true_label", "source_split"])
+        writer = csv.DictWriter(
+            handle, fieldnames=["path", "true_label", "source_split"]
+        )
         writer.writeheader()
         for index in indices:
             sample_path, label = samples[index]
@@ -741,9 +774,13 @@ def choose_device(requested: str, torch_module: Any):
 
 def build_optimizer(settings: TrainSettings, torch_module: Any, model: Any):
     name = settings.optimizer.lower()
-    parameters = [parameter for parameter in model.parameters() if parameter.requires_grad]
+    parameters = [
+        parameter for parameter in model.parameters() if parameter.requires_grad
+    ]
     if not parameters:
-        raise ValueError("No trainable parameters are available for the requested freeze mode.")
+        raise ValueError(
+            "No trainable parameters are available for the requested freeze mode."
+        )
     if name == "adamw":
         return torch_module.optim.AdamW(
             parameters,
@@ -780,7 +817,10 @@ def set_trainable(module: Any, trainable: bool) -> None:
 def apply_freeze_mode(model: Any, model_name: str, freeze_mode: str) -> dict[str, Any]:
     """Apply the same head/last-block policy across supported architectures."""
     if freeze_mode == "none":
-        return {"mode": freeze_mode, "trainable_parameters": count_trainable_parameters(model)}
+        return {
+            "mode": freeze_mode,
+            "trainable_parameters": count_trainable_parameters(model),
+        }
 
     set_trainable(model, False)
     unfrozen: list[str] = []
@@ -814,7 +854,13 @@ def apply_freeze_mode(model: Any, model_name: str, freeze_mode: str) -> dict[str
 
 
 def count_trainable_parameters(model: Any) -> int:
-    return int(sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad))
+    return int(
+        sum(
+            parameter.numel()
+            for parameter in model.parameters()
+            if parameter.requires_grad
+        )
+    )
 
 
 def autocast_context(torch_module: Any, enabled: bool, device: Any):
@@ -911,9 +957,19 @@ def train(settings: TrainSettings, json_output: Path | None) -> dict[str, Any]:
         splits=validation_splits,
     )
     if not validation.ok:
-        raise RuntimeError("Dataset validation failed; run scripts/check_dataset.py for details.")
+        raise RuntimeError(
+            "Dataset validation failed; run scripts/check_dataset.py for details."
+        )
 
-    np_module, timm_module, torch_module, DataLoader, Subset, _WeightedRandomSampler, transforms_module = import_training_stack()
+    (
+        np_module,
+        timm_module,
+        torch_module,
+        DataLoader,
+        Subset,
+        _WeightedRandomSampler,
+        transforms_module,
+    ) = import_training_stack()
     set_seed(settings.seed, np_module, torch_module)
     device = choose_device(settings.device, torch_module)
     use_amp = settings.mixed_precision and device.type == "cuda"
@@ -1046,7 +1102,9 @@ def train(settings: TrainSettings, json_output: Path | None) -> dict[str, Any]:
         if settings.use_class_weights
         else [1.0 for _ in settings.classes]
     )
-    weights_tensor = torch_module.tensor(class_weights, dtype=torch_module.float32, device=device)
+    weights_tensor = torch_module.tensor(
+        class_weights, dtype=torch_module.float32, device=device
+    )
     criterion = torch_module.nn.CrossEntropyLoss(
         weight=weights_tensor,
         label_smoothing=settings.label_smoothing,
@@ -1134,13 +1192,17 @@ def train(settings: TrainSettings, json_output: Path | None) -> dict[str, Any]:
     write_json(output_path, report)
     write_json(settings.results_dir / "training_latest.json", report)
     print(f"Wrote training summary: {output_path.as_posix()}")
-    print(f"Wrote latest training summary: {(settings.results_dir / 'training_latest.json').as_posix()}")
+    print(
+        f"Wrote latest training summary: {(settings.results_dir / 'training_latest.json').as_posix()}"
+    )
     return report
 
 
 def main() -> int:
     args = parse_args()
-    config_path = None if args.config.lower() == "none" else resolve_project_path(args.config)
+    config_path = (
+        None if args.config.lower() == "none" else resolve_project_path(args.config)
+    )
     config = deep_merge(DEFAULT_CONFIG, load_yaml_config(config_path))
     settings = build_settings(args, config)
 
@@ -1153,7 +1215,9 @@ def main() -> int:
             print(f"Wrote readiness report: {readiness_output.as_posix()}")
         return 0 if report["ok"] else 1
 
-    output_path = resolve_project_path(args.json_output) if args.json_output is not None else None
+    output_path = (
+        resolve_project_path(args.json_output) if args.json_output is not None else None
+    )
     train(settings, output_path)
     return 0
 

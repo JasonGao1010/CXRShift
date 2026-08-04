@@ -56,12 +56,8 @@ class DatasetUtilsTest(unittest.TestCase):
         self.assertAlmostEqual(weights[1], 2.0 / 3.0)
 
     def test_stratified_holdout_indices_keep_each_class(self) -> None:
-        samples = [
-            (Path(f"n{i}.jpeg"), 0)
-            for i in range(10)
-        ] + [
-            (Path(f"p{i}.jpeg"), 1)
-            for i in range(20)
+        samples = [(Path(f"n{i}.jpeg"), 0) for i in range(10)] + [
+            (Path(f"p{i}.jpeg"), 1) for i in range(20)
         ]
 
         train_indices, holdout_indices = stratified_holdout_indices(

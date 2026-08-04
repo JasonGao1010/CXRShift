@@ -29,10 +29,14 @@ def resolve_project_path(path: Path | str) -> Path:
 
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
-def copy_split(source_root: Path, output_root: Path, split: str, prefix: str) -> dict[str, int]:
+def copy_split(
+    source_root: Path, output_root: Path, split: str, prefix: str
+) -> dict[str, int]:
     """Link one source split into a namespace that preserves source identity."""
     counts = {class_name: 0 for class_name in DEFAULT_CLASSES}
     for class_name in DEFAULT_CLASSES:
@@ -51,7 +55,9 @@ def copy_split(source_root: Path, output_root: Path, split: str, prefix: str) ->
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Merge two binary ImageFolder datasets.")
+    parser = argparse.ArgumentParser(
+        description="Merge two binary ImageFolder datasets."
+    )
     parser.add_argument("--source-a", type=Path, required=True)
     parser.add_argument("--source-b", type=Path, required=True)
     parser.add_argument("--prefix-a", type=str, default="a")
@@ -80,7 +86,9 @@ def main() -> int:
         resolved_output.is_relative_to(source) or source.is_relative_to(resolved_output)
         for source in resolved_sources
     ):
-        raise ValueError("--output-root must not overlap the project or either source root")
+        raise ValueError(
+            "--output-root must not overlap the project or either source root"
+        )
     resolved_summary = summary_output.resolve()
     if any(
         resolved_summary == source or resolved_summary.is_relative_to(source)

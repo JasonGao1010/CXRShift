@@ -98,7 +98,9 @@ def collect(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def assign_subjects(rows: list[dict[str, Any]], seed: int, train_fraction: float, val_fraction: float) -> dict[tuple[str, str], str]:
+def assign_subjects(
+    rows: list[dict[str, Any]], seed: int, train_fraction: float, val_fraction: float
+) -> dict[tuple[str, str], str]:
     """Assign complete filename clusters while preserving class proportions."""
     by_label: dict[str, set[str]] = defaultdict(set)
     for row in rows:
@@ -111,17 +113,33 @@ def assign_subjects(rows: list[dict[str, Any]], seed: int, train_fraction: float
         n_train = round(len(ordered) * train_fraction)
         n_val = round(len(ordered) * val_fraction)
         for index, item in enumerate(ordered):
-            split = "train" if index < n_train else "val" if index < n_train + n_val else "test"
+            split = (
+                "train"
+                if index < n_train
+                else "val"
+                if index < n_train + n_val
+                else "test"
+            )
             assignments[(label, item)] = split
     return assignments
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Build a filename-grouped Kermany dataset.")
+    parser = argparse.ArgumentParser(
+        description="Build a filename-grouped Kermany dataset."
+    )
     parser.add_argument("--source-root", type=Path, default=Path("data/raw/chest_xray"))
-    parser.add_argument("--output-root", type=Path, default=Path("data/processed/kermany_grouped_seed42"))
-    parser.add_argument("--manifest", type=Path, default=Path("data/splits/kermany_grouped_seed42.csv"))
-    parser.add_argument("--summary", type=Path, default=Path("results/kermany_grouped_summary.json"))
+    parser.add_argument(
+        "--output-root",
+        type=Path,
+        default=Path("data/processed/kermany_grouped_seed42"),
+    )
+    parser.add_argument(
+        "--manifest", type=Path, default=Path("data/splits/kermany_grouped_seed42.csv")
+    )
+    parser.add_argument(
+        "--summary", type=Path, default=Path("results/kermany_grouped_summary.json")
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--train-fraction", type=float, default=0.70)
     parser.add_argument("--val-fraction", type=float, default=0.10)
@@ -196,10 +214,14 @@ def build_summary(
         for candidate in (source, destination):
             try:
                 candidate.resolve().relative_to(
-                    source_root.resolve() if candidate == source else output_root.resolve()
+                    source_root.resolve()
+                    if candidate == source
+                    else output_root.resolve()
                 )
             except ValueError as exc:
-                raise ValueError(f"Manifest path escapes its dataset root: {candidate}") from exc
+                raise ValueError(
+                    f"Manifest path escapes its dataset root: {candidate}"
+                ) from exc
         if not source.is_file() or not destination.is_file():
             missing_files.append(row["path"])
             continue
@@ -257,7 +279,9 @@ def write_summary_safely(path: Path, payload: dict[str, Any], *, force: bool) ->
         if not force:
             raise FileExistsError(f"Temporary summary already exists: {temporary}")
         temporary.unlink()
-    temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     temporary.replace(path)
 
 
@@ -308,8 +332,12 @@ def materialize_from_manifest(args: argparse.Namespace) -> int:
             except OSError:
                 shutil.copy2(source, destination)
         summary = build_summary(
-            rows=rows, seed=args.seed, source_root=source_root,
-            output_root=output_root, manifest=manifest, verify_files=True,
+            rows=rows,
+            seed=args.seed,
+            source_root=source_root,
+            output_root=output_root,
+            manifest=manifest,
+            verify_files=True,
         )
         write_summary_safely(summary_path, summary, force=False)
     except Exception:
@@ -330,8 +358,14 @@ def main() -> int:
         return verify_frozen_outputs(args)
     if args.from_manifest:
         return materialize_from_manifest(args)
-    if args.train_fraction <= 0 or args.val_fraction <= 0 or args.train_fraction + args.val_fraction >= 1:
-        raise ValueError("fractions must be positive and leave a non-empty test fraction")
+    if (
+        args.train_fraction <= 0
+        or args.val_fraction <= 0
+        or args.train_fraction + args.val_fraction >= 1
+    ):
+        raise ValueError(
+            "fractions must be positive and leave a non-empty test fraction"
+        )
     source_root, output_root = resolve(args.source_root), resolve(args.output_root)
     manifest = resolve(args.manifest)
     summary_path = resolve(args.summary)
@@ -345,7 +379,9 @@ def main() -> int:
         raise ValueError("--output-root must not overlap the project or source roots")
     prepare_output_paths([output_root, manifest, summary_path], force=args.force)
     rows = collect(source_root)
-    assignments = assign_subjects(rows, args.seed, args.train_fraction, args.val_fraction)
+    assignments = assign_subjects(
+        rows, args.seed, args.train_fraction, args.val_fraction
+    )
     manifest_rows = []
     for row in rows:
         split = assignments[(row["label"], row["subject_id"])]
@@ -368,9 +404,16 @@ def main() -> int:
     with manifest.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=MANIFEST_FIELDS, lineterminator="\n")
         writer.writeheader()
-        writer.writerows(sorted(manifest_rows, key=lambda x: (x["split"], x["true_label"], x["path"])))
+        writer.writerows(
+            sorted(
+                manifest_rows, key=lambda x: (x["split"], x["true_label"], x["path"])
+            )
+        )
     summary = build_summary(
-        rows=[{field: str(row[field]) for field in MANIFEST_FIELDS} for row in manifest_rows],
+        rows=[
+            {field: str(row[field]) for field in MANIFEST_FIELDS}
+            for row in manifest_rows
+        ],
         seed=args.seed,
         source_root=source_root,
         output_root=output_root,

@@ -354,9 +354,13 @@ def format_validation_report(result: DatasetValidationResult) -> str:
         rows.append(row)
         widths = [max(width, len(value)) for width, value in zip(widths, row)]
 
-    lines.append("  " + "  ".join(value.ljust(width) for value, width in zip(header, widths)))
+    lines.append(
+        "  " + "  ".join(value.ljust(width) for value, width in zip(header, widths))
+    )
     for row in rows:
-        lines.append("  " + "  ".join(value.ljust(width) for value, width in zip(row, widths)))
+        lines.append(
+            "  " + "  ".join(value.ljust(width) for value, width in zip(row, widths))
+        )
 
     if result.missing_dirs:
         lines.extend(["", "Missing directories:"])

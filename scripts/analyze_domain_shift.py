@@ -43,9 +43,9 @@ MODEL_FEATURE_INDICES = [
 def image_features(path: Path) -> list[float]:
     """Extract low-capacity intensity and geometry features for source auditing."""
     with Image.open(path) as image:
-        gray = np.asarray(
-            image.convert("L").resize((128, 128)), dtype=np.float32
-        ) / 255.0
+        gray = (
+            np.asarray(image.convert("L").resize((128, 128)), dtype=np.float32) / 255.0
+        )
         width, height = image.size
     border = np.concatenate(
         [gray[:8].ravel(), gray[-8:].ravel(), gray[:, :8].ravel(), gray[:, -8:].ravel()]
@@ -53,9 +53,7 @@ def image_features(path: Path) -> list[float]:
     center = gray[32:96, 32:96]
     hist, _ = np.histogram(gray, bins=32, range=(0, 1), density=False)
     prob = hist / max(hist.sum(), 1)
-    entropy = -sum(
-        float(value) * math.log(float(value) + 1e-12) for value in prob
-    )
+    entropy = -sum(float(value) * math.log(float(value) + 1e-12) for value in prob)
     return [
         float(gray.mean()),
         float(gray.std()),
@@ -139,8 +137,7 @@ def _counts(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "by_source": {name: source[name] for name in ("kermany", "rsna")},
         "by_source_and_label": {
             name: {
-                label: source_label[(name, label)]
-                for label in ("NORMAL", "PNEUMONIA")
+                label: source_label[(name, label)] for label in ("NORMAL", "PNEUMONIA")
             }
             for name in ("kermany", "rsna")
         },
@@ -161,9 +158,7 @@ def evaluate_source_classifier(
     if len(set(y.tolist())) != 2:
         raise ValueError("Both sources are required for source classification")
     x_model = x[:, MODEL_FEATURE_INDICES]
-    folds = StratifiedGroupKFold(
-        n_splits=5, shuffle=True, random_state=random_state
-    )
+    folds = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=random_state)
     predictions = np.zeros(len(rows), dtype=float)
     fold_results: list[dict[str, Any]] = []
     for fold, (train, test) in enumerate(folds.split(x_model, y, groups), 1):
@@ -199,9 +194,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--kermany", type=Path, default=Path("data/processed/kermany_grouped_seed42")
     )
-    parser.add_argument(
-        "--rsna", type=Path, default=Path("data/processed/rsna_binary")
-    )
+    parser.add_argument("--rsna", type=Path, default=Path("data/processed/rsna_binary"))
     parser.add_argument("--limit-per-source", type=int, default=1500)
     parser.add_argument(
         "--output", type=Path, default=Path("results/domain_shift_diagnostic.json")
@@ -211,15 +204,14 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    kermany_root = args.kermany if args.kermany.is_absolute() else PROJECT_ROOT / args.kermany
+    kermany_root = (
+        args.kermany if args.kermany.is_absolute() else PROJECT_ROOT / args.kermany
+    )
     rsna_root = args.rsna if args.rsna.is_absolute() else PROJECT_ROOT / args.rsna
     rows = collect(kermany_root, "kermany", args.limit_per_source) + collect(
         rsna_root, "rsna", args.limit_per_source
     )
-    feature_by_path = {
-        row["path"]: image_features(row["path"])
-        for row in rows
-    }
+    feature_by_path = {row["path"]: image_features(row["path"]) for row in rows}
     unadjusted = evaluate_source_classifier(rows, feature_by_path)
     label_matched_rows = select_label_matched(rows)
     label_matched = evaluate_source_classifier(label_matched_rows, feature_by_path)
@@ -239,7 +231,9 @@ def main() -> int:
             "limit_per_source": args.limit_per_source,
         },
         "features": FEATURE_NAMES,
-        "classifier_features": [FEATURE_NAMES[index] for index in MODEL_FEATURE_INDICES],
+        "classifier_features": [
+            FEATURE_NAMES[index] for index in MODEL_FEATURE_INDICES
+        ],
         "cross_validation": {
             "method": "5-fold StratifiedGroupKFold",
             "shuffle": True,
@@ -285,7 +279,9 @@ def main() -> int:
                 "unadjusted_roc_auc": unadjusted["overall_roc_auc"],
                 "label_matched_roc_auc": label_matched["overall_roc_auc"],
                 "normal_only_roc_auc": label_stratified["NORMAL"]["overall_roc_auc"],
-                "pneumonia_only_roc_auc": label_stratified["PNEUMONIA"]["overall_roc_auc"],
+                "pneumonia_only_roc_auc": label_stratified["PNEUMONIA"][
+                    "overall_roc_auc"
+                ],
             },
             indent=2,
         )

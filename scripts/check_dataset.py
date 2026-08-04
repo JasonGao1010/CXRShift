@@ -111,7 +111,10 @@ def main() -> int:
     data_root = args.data_root or Path(
         nested_get(config, "paths", "data_root", default="data/raw/chest_xray")
     )
-    classes = tuple(args.classes or nested_get(config, "project", "classes", default=DEFAULT_CLASSES))
+    classes = tuple(
+        args.classes
+        or nested_get(config, "project", "classes", default=DEFAULT_CLASSES)
+    )
     splits = tuple(args.splits or DEFAULT_SPLITS)
 
     result = validate_dataset_layout(

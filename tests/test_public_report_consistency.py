@@ -63,12 +63,16 @@ def test_public_tree_contains_no_dataset_derived_medical_images():
 
 
 def test_public_narrative_preserves_the_key_scope_conditions():
-    text = " ".join("\n".join(
-        [
-            (ROOT / "README.md").read_text(encoding="utf-8"),
-            (ROOT / "data/README.md").read_text(encoding="utf-8"),
-        ]
-    ).lower().split())
+    text = " ".join(
+        "\n".join(
+            [
+                (ROOT / "README.md").read_text(encoding="utf-8"),
+                (ROOT / "data/README.md").read_text(encoding="utf-8"),
+            ]
+        )
+        .lower()
+        .split()
+    )
     for statement in (
         "not a verified patient identifier",
         "prevalence-representative clinical cohort",

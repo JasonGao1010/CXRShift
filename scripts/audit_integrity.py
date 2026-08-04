@@ -49,7 +49,9 @@ def infer_dataset_kind(root: Path) -> str:
     return "kermany"
 
 
-def kermany_filename_token(path: Path, label: str, subtype_sensitive: bool = True) -> str:
+def kermany_filename_token(
+    path: Path, label: str, subtype_sensitive: bool = True
+) -> str:
     """Return a conservative filename-derived grouping token.
 
     Pneumonia ``personN`` counters are namespaced by the filename subtype when
@@ -112,7 +114,9 @@ def iter_images(root: Path) -> Iterable[tuple[str, str, Path]]:
 def _kermany_token_sensitivity(
     rows: list[tuple[str, str, Path]],
 ) -> dict[str, Any]:
-    by_split_subtype: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
+    by_split_subtype: dict[str, dict[str, set[str]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for split, label, path in rows:
         if label != "PNEUMONIA":
             continue
@@ -213,7 +217,9 @@ def audit_dataset(
         for group, labels in sorted(group_labels.items())
         if len(labels) > 1
     ]
-    split_integrity_ok = not group_overlap and not cross_split_duplicates and not label_conflicts
+    split_integrity_ok = (
+        not group_overlap and not cross_split_duplicates and not label_conflicts
+    )
     payload: dict[str, Any] = {
         "root": root.as_posix(),
         "dataset_kind": dataset_kind,
@@ -254,7 +260,9 @@ def recompute_metrics(rows: list[dict[str, str]]) -> dict[str, Any]:
         "recall": float(recall_score(y_true, y_pred, zero_division=0)),
         "specificity": float(tn / (tn + fp)) if tn + fp else 0.0,
         "f1": float(f1_score(y_true, y_pred, zero_division=0)),
-        "roc_auc": float(roc_auc_score(y_true, scores)) if len(set(y_true)) == 2 else None,
+        "roc_auc": float(roc_auc_score(y_true, scores))
+        if len(set(y_true)) == 2
+        else None,
         "brier_score": float(brier_score_loss(y_true, scores)),
         "confusion_matrix": matrix,
     }
@@ -278,7 +286,12 @@ def audit_evaluations(results_dir: Path, tolerance: float = 2e-7) -> dict[str, A
             continue
         prediction_path = resolve(prediction_value)
         if not prediction_path.is_file():
-            missing_predictions.append({"evaluation": json_path.as_posix(), "predictions": prediction_path.as_posix()})
+            missing_predictions.append(
+                {
+                    "evaluation": json_path.as_posix(),
+                    "predictions": prediction_path.as_posix(),
+                }
+            )
             continue
         with prediction_path.open("r", newline="", encoding="utf-8") as handle:
             rows = list(csv.DictReader(handle))
@@ -286,15 +299,33 @@ def audit_evaluations(results_dir: Path, tolerance: float = 2e-7) -> dict[str, A
         stored = payload.get("metrics", {})
         checked += 1
         if len(rows) != payload.get("sample_count"):
-            mismatches.append({"evaluation": json_path.as_posix(), "field": "sample_count", "stored": payload.get("sample_count"), "recomputed": len(rows)})
+            mismatches.append(
+                {
+                    "evaluation": json_path.as_posix(),
+                    "field": "sample_count",
+                    "stored": payload.get("sample_count"),
+                    "recomputed": len(rows),
+                }
+            )
         for field, value in current.items():
             old = stored.get(field)
             # Older result files legitimately predate newly-added fields.
             if old is None:
                 continue
-            equal = old == value if field == "confusion_matrix" else abs(float(old) - float(value)) <= tolerance
+            equal = (
+                old == value
+                if field == "confusion_matrix"
+                else abs(float(old) - float(value)) <= tolerance
+            )
             if not equal:
-                mismatches.append({"evaluation": json_path.as_posix(), "field": field, "stored": old, "recomputed": value})
+                mismatches.append(
+                    {
+                        "evaluation": json_path.as_posix(),
+                        "field": field,
+                        "stored": old,
+                        "recomputed": value,
+                    }
+                )
     return {
         "file_pattern": "*__evaluation.json or *eval_*.json",
         "discovered_files": len(evaluation_paths),
@@ -306,10 +337,14 @@ def audit_evaluations(results_dir: Path, tolerance: float = 2e-7) -> dict[str, A
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Audit data splits and stored evaluation metrics.")
+    parser = argparse.ArgumentParser(
+        description="Audit data splits and stored evaluation metrics."
+    )
     parser.add_argument("--dataset", type=Path, action="append", default=[])
     parser.add_argument("--results-dir", type=Path, default=Path("results"))
-    parser.add_argument("--output", type=Path, default=Path("results/integrity_audit.json"))
+    parser.add_argument(
+        "--output", type=Path, default=Path("results/integrity_audit.json")
+    )
     parser.add_argument("--skip-image-hashes", action="store_true")
     return parser.parse_args()
 
@@ -322,7 +357,11 @@ def main() -> int:
     ]
     payload: dict[str, Any] = {
         "schema_version": 2,
-        "datasets": [audit_dataset(resolve(path), not args.skip_image_hashes) for path in datasets if resolve(path).exists()],
+        "datasets": [
+            audit_dataset(resolve(path), not args.skip_image_hashes)
+            for path in datasets
+            if resolve(path).exists()
+        ],
         "evaluations": audit_evaluations(resolve(args.results_dir)),
     }
     payload["ok"] = payload["evaluations"]["ok"] and all(
@@ -330,7 +369,9 @@ def main() -> int:
     )
     output = resolve(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Integrity audit status: {'PASS' if payload['ok'] else 'FAIL'}")
     print(f"Wrote: {output.as_posix()}")
     return 0 if payload["ok"] else 2
