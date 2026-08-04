@@ -73,6 +73,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
 
 @dataclass(frozen=True)
 class TrainSettings:
+    protocol_id: str
+    model_id: str
+    recipe_id: str
+    training_dataset_id: str
     classes: tuple[str, ...]
     data_root: Path
     train_split: str
@@ -261,8 +265,19 @@ def timestamp() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
+def training_identity(settings: TrainSettings) -> dict[str, str]:
+    """Return the protocol identity persisted with every training artifact."""
+    return {
+        "id": settings.protocol_id,
+        "model": settings.model_id,
+        "recipe": settings.recipe_id,
+        "training_dataset": settings.training_dataset_id,
+    }
+
+
 def to_jsonable_settings(settings: TrainSettings) -> dict[str, Any]:
     return {
+        "protocol": training_identity(settings),
         "classes": list(settings.classes),
         "data_root": settings.data_root.as_posix(),
         "train_split": settings.train_split,
@@ -482,6 +497,23 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
         use_class_weights = args.class_weights
 
     return TrainSettings(
+        protocol_id=str(nested_get(config, "protocol", "id", default="untracked")),
+        model_id=str(
+            nested_get(
+                config,
+                "protocol",
+                "model",
+                default=nested_get(config, "training", "model", default="unspecified"),
+            )
+        ),
+        recipe_id=str(
+            nested_get(config, "protocol", "recipe", default="custom")
+        ),
+        training_dataset_id=str(
+            nested_get(
+                config, "protocol", "training_dataset", default="unspecified"
+            )
+        ),
         classes=classes,
         data_root=data_root,
         train_split=str(nested_get(config, "data", "train_split", default="train")),
@@ -544,7 +576,13 @@ def build_settings(args: argparse.Namespace, config: dict[str, Any]) -> TrainSet
             if args.init_checkpoint is not None
             else None
         ),
-        domain_balanced_prefixes=tuple(args.domain_balanced_prefixes or ()),
+        domain_balanced_prefixes=tuple(
+            args.domain_balanced_prefixes
+            if args.domain_balanced_prefixes is not None
+            else nested_get(
+                config, "training", "domain_balanced_prefixes", default=()
+            )
+        ),
         freeze_mode=str(args.freeze_mode),
         label_smoothing=float(
             args.label_smoothing
