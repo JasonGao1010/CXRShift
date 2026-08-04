@@ -50,12 +50,30 @@ python scripts/prepare_kermany_grouped.py \
 ## RSNA-1707
 
 **Source.** The
-[RSNA Pneumonia Detection Challenge](https://www.rsna.org/artificial-intelligence/ai-image-challenge/rsna-pneumonia-detection-challenge-2018)
+[RSNA Pneumonia Detection Challenge](https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/rsna-pneumonia-detection-challenge-2018)
 and its official
 [data terms and attribution requirements](https://www.rsna.org/-/media/Files/RSNA/Education/AI-resources-and-training/AI-image-challenge/pneumonia-detection-challenge-terms-of-use-and-attribution.ashx?hash=FF7A635F6DFFAD31A30C8715DFA3B8FC21131543&la=en).
 The NIH Clinical Center provided the underlying images; RSNA and the Society for
 Thoracic Radiology supplied the challenge annotations. Users must also follow
 the attribution requirements stated in the official terms.
+
+### Required attribution
+
+The RSNA-derived manifest and predictions in this repository are redistributed
+with the attribution required by the challenge terms:
+
+- The underlying [NIH Chest X-ray Dataset](https://nihcc.app.box.com/v/ChestXray-NIHCC)
+  was provided by the NIH Clinical Center. See X. Wang, Y. Peng, L. Lu, Z. Lu,
+  M. Bagheri, and R. M. Summers, “ChestX-ray8: Hospital-scale Chest X-ray
+  Database and Benchmarks on Weakly-Supervised Classification and Localization
+  of Common Thorax Diseases,” *Proceedings of the IEEE Conference on Computer
+  Vision and Pattern Recognition*, pp. 3462–3471, 2017.
+- The RSNA–Society of Thoracic Radiology challenge images and annotations are
+  available from the [official challenge page](https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/rsna-pneumonia-detection-challenge-2018).
+  See G. Shih *et al.*, “Augmenting the National Institutes of Health Chest
+  Radiograph Dataset with Expert Annotations of Possible Pneumonia,”
+  *Radiology: Artificial Intelligence*, 1(1):e180041, 2019,
+  [doi:10.1148/ryai.2019180041](https://doi.org/10.1148/ryai.2019180041).
 
 The conversion maps challenge `Target=1` to the local directory name
 `PNEUMONIA` and `Target=0` to `NORMAL`. These names denote the challenge target
