@@ -21,4 +21,13 @@ jobs:
       - run: python -m pip install -r requirements.txt
       - run: python -m pytest -q
       - run: python scripts/check_protocol.py
+      - name: Recompute committed numerical summary
+        run: |
+          python scripts/summarize_results.py \
+            --results-dir results \
+            --output-json rebuild/CXRShift__main-summary.json \
+            --output-csv rebuild/CXRShift__main-summary.csv \
+            --require-complete
+      - run: cmp results/CXRShift__main-summary.json rebuild/CXRShift__main-summary.json
+      - run: cmp results/CXRShift__main-summary.csv rebuild/CXRShift__main-summary.csv
       - run: python scripts/reproduce_all.py --dry-run --stage all

@@ -4,13 +4,16 @@
 [![Release](https://img.shields.io/github/v/release/JasonGao1010/CXRShift)](https://github.com/JasonGao1010/CXRShift/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2f6f62.svg)](LICENSE)
 
-**An auditable study of cross-source robustness in chest X-ray
+**An evidence-backed study of cross-source robustness in chest X-ray
 classification.** Across three ImageNet-pretrained backbones and three random
 seeds, balanced accuracy decreases from **97.27–98.17%** on Kermany-FG to
-**65.91–66.95%** on RSNA-1707. The consistency of this drop across architectures
-shows that changing the backbone alone does not resolve the source shift.
+**65.91–66.95%** on RSNA-1707. Within this protocol, none of the tested
+backbones eliminated the source-associated performance gap.
 
 ![Cross-source balanced accuracy and training-strategy effects](figures/cross_source_summary.png)
+
+Error bars show 95% grouped-bootstrap intervals for the absolute balanced
+accuracy of each ensemble.
 
 ## Study design
 
@@ -25,10 +28,10 @@ protocol:
 - 5,000-iteration grouped bootstrap intervals and paired comparisons on
   identical resamples.
 
-The public evidence package contains the frozen manifests, 36 per-image
-prediction files, the complete numerical summary, and the code required to
-recompute every reported value. Raw medical images and model checkpoints are
-not redistributed.
+The repository contains the split manifests, 36 per-image prediction files,
+the numerical summary, and the analysis code needed to reproduce the reported
+statistics from those predictions. Raw medical images and model checkpoints
+are not redistributed.
 
 ## Results
 
@@ -55,23 +58,36 @@ alter this trade-off:
 JT and JT-DBS use RSNA training and validation labels. They measure adaptation
 to a known source, not zero-shot generalization to an unseen institution.
 
-The machine-readable source of truth is
+The complete machine-readable result is
 [`results/CXRShift__main-summary.json`](results/CXRShift__main-summary.json).
 
-## Technical contributions
+## What the evidence supports
 
-- A conservative Kermany split that keeps filename-derived clusters together
-  without presenting those clusters as verified patient identities.
-- A frozen 1,707-member RSNA audit subset that can be reconstructed from the
-  official challenge archive and checked against file hashes.
-- A single experiment identity protocol spanning model, strategy, seed,
-  dataset, split, and artifact type.
-- Grouped uncertainty estimates and paired strategy comparisons computed from
-  committed per-image predictions rather than copied table values.
-- A clean data-to-results pipeline that retrains all 18 model instances and
-  writes new outputs outside the published evidence directory.
+- The cross-source gap is consistent across DenseNet121, ConvNeXt-Tiny, and
+  ViT-B/16, so backbone substitution alone is not supported as a remedy.
+- Joint training increases RSNA-1707 balanced accuracy, but it uses labels from
+  that source and therefore measures known-source adaptation rather than
+  unseen-site generalization.
+- A separate raw-image diagnostic uses simple image statistics to distinguish
+  sources and reaches **0.944 AUROC** under label-matched grouped
+  cross-validation
+  ([result](results/domain_shift_diagnostic.json),
+  [analysis](scripts/analyze_domain_shift.py)). This descriptive diagnostic
+  shows that source remains readily identifiable after matching label counts;
+  it does not identify the causal mechanism of the performance gap.
+- Grouped confidence intervals and paired strategy comparisons are recomputed
+  from per-image probabilities, with filename clusters used for Kermany-FG and
+  `patientId` used for RSNA-1707.
 
-## Verify the published evidence
+These findings are consistent with earlier reports that chest X-ray models can
+lose performance across institutions or exploit source-specific signals. See
+[Zech et al. (2018)](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1002683),
+[Cohen et al. (2020)](https://proceedings.mlr.press/v121/cohen20a.html), and
+[DeGrave et al. (2021)](https://www.nature.com/articles/s42256-021-00338-7).
+CXRShift contributes a compact prediction-level audit and an explicit
+raw-data rebuild path; it does not propose a new domain-generalization model.
+
+## Reproduce the reported statistics
 
 The lightweight verification path does not require either image dataset:
 
@@ -89,16 +105,20 @@ python scripts/summarize_results.py \
   --require-complete
 ```
 
-For a full rebuild from separately downloaded Kermany and official RSNA data:
+This path has been executed against the committed prediction files and is
+deterministic. The repository also implements a raw-data-to-prediction rebuild:
 
 ```bash
 python scripts/reproduce_all.py --dry-run --stage all
 python scripts/reproduce_all.py --stage all --device cuda
 ```
 
-The full run trains 18 model instances and evaluates each on both test sets.
-See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the data layout, experiment
-matrix, and verification criteria.
+The full command reconstructs the prepared datasets, trains 18 model instances,
+and evaluates each on both test sets. It has **not** been independently executed
+end to end for this release, so the repository does not claim that a clean
+raw-data rebuild has reproduced the committed predictions. See
+[`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the precise evidence boundary,
+data layout, experiment matrix, and comparison criteria.
 
 ## Interpretation
 
@@ -135,6 +155,7 @@ tests/          Focused semantic and numerical checks
 Jinze Gao designed the study and implemented the data, training, evaluation,
 statistical-analysis, and reproducibility pipelines.
 
-The MIT license covers the original code only. Dataset licenses and terms remain
-with their respective providers. If you use the software or published evidence,
-please cite the metadata in [`CITATION.cff`](CITATION.cff).
+The MIT license covers the original code only. Dataset manifests and prediction
+artifacts retain the source datasets' terms; see
+[`DATA_LICENSE.md`](DATA_LICENSE.md). If you use the software or reported
+evidence, please cite the metadata in [`CITATION.cff`](CITATION.cff).

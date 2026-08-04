@@ -14,10 +14,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from xray_pneumonia.protocol import Identity, artifact_name  # noqa: E402
 
-MODELS = {
+MODEL_CONFIGS = {
     "DenseNet121": "configs/DenseNet121__ERM.yaml",
     "ConvNeXt-Tiny": "configs/ConvNeXt-Tiny__ERM.yaml",
     "ViT-B/16": "configs/ViT-B16__ERM.yaml",
+}
+RECIPE_CONFIGS = {
+    "ERM": "configs/DenseNet121__ERM.yaml",
+    "ERM-Reg": "configs/DenseNet121__ERM-Reg.yaml",
+    "JT": "configs/DenseNet121__JT.yaml",
+    "JT-DBS": "configs/DenseNet121__JT-DBS.yaml",
 }
 SEEDS = (42, 43, 44)
 RECIPES = ("ERM", "ERM-Reg", "JT", "JT-DBS")
@@ -123,18 +129,13 @@ def train(args: argparse.Namespace, recipe: str, model: str, seed: int) -> Path:
     """Train one canonical model/strategy/seed identity."""
     work = args.work_dir
     identity = Identity(model, recipe, seed)
-    config = (
-        "configs/DenseNet121__ERM-Reg.yaml" if recipe == "ERM-Reg" else MODELS[model]
-    )
+    config = RECIPE_CONFIGS[recipe] if model == "DenseNet121" else MODEL_CONFIGS[model]
     data_root = work / (
         "data/kermany_rsna_mixed"
         if recipe.startswith("JT")
         else "data/kermany_grouped_seed42"
     )
     summary = work / f"results/{identity.run_id}__training.json"
-    extra = (
-        ["--domain-balanced-prefixes", "kermany", "rsna"] if recipe == "JT-DBS" else []
-    )
     run(
         command(
             "scripts/train.py",
@@ -152,7 +153,6 @@ def train(args: argparse.Namespace, recipe: str, model: str, seed: int) -> Path:
             args.device,
             "--json-output",
             summary,
-            *extra,
         ),
         dry_run=args.dry_run,
     )
@@ -201,7 +201,7 @@ def evaluate(
 
 
 def experiment_stage(args: argparse.Namespace) -> None:
-    for model in MODELS:
+    for model in MODEL_CONFIGS:
         for seed in SEEDS:
             summary = train(args, "ERM", model, seed)
             evaluate(args, "ERM", model, seed, summary, "kermany", "test")

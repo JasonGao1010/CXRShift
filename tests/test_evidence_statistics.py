@@ -2,6 +2,7 @@ from pathlib import Path
 
 from scripts.analyze_domain_shift import select_label_matched
 from scripts.summarize_results import (
+    bootstrap_ci,
     filename_group_from_path,
     paired_bootstrap_ci,
 )
@@ -30,6 +31,16 @@ def test_paired_bootstrap_reports_candidate_minus_baseline():
 
     assert interval["accuracy"][0] >= 0.0
     assert interval["brier_score"][1] < 0.0
+
+
+def test_grouped_bootstrap_reports_absolute_candidate_uncertainty():
+    y = [0, 0, 1, 1]
+    score = [0.1, 0.2, 0.8, 0.9]
+    groups = ["n1", "n2", "p1", "p2"]
+
+    interval = bootstrap_ci(y, score, groups, iterations=200, seed=7)
+
+    assert interval["balanced_accuracy"] == [1.0, 1.0]
 
 
 def test_label_matching_equalizes_each_label_stratum():

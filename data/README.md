@@ -3,7 +3,8 @@
 CXRShift distributes manifests and derived predictions, not medical images.
 Reproduction requires independent downloads from the dataset providers and
 compliance with their terms. The repository's MIT license applies only to the
-original code.
+original code. See [`../DATA_LICENSE.md`](../DATA_LICENSE.md) for the licensing
+boundary of the distributed artifacts.
 
 ## Kermany-FG
 
@@ -95,6 +96,29 @@ Each `patientId` appears in exactly one split. The manifest records membership,
 target, split, and raw/processed hashes:
 
 [`splits/rsna_available_1707_manifest.csv`](splits/rsna_available_1707_manifest.csv)
+
+### Historical acquisition record
+
+The original local subset was assembled in more than one acquisition batch.
+Two retained downloader reports associate 1,573 of the 1,707 members with the
+Hugging Face mirror `Baldezo313/rsna-pneumonia-dataset`: an earlier report lists
+88 members and a later report lists all 1,573. Their verified local report
+hashes are recorded in
+[`splits/rsna_available_1707_manifest_summary.json`](splits/rsna_available_1707_manifest_summary.json).
+The reports themselves are not distributed.
+
+No retained report establishes the acquisition route for the remaining 134
+members. Their `source_batch`, `source_provider`, and `source_report` fields are
+therefore left as `unknown`; they are not retrospectively attributed to either
+the mirror or the official archive. The manifest's path fields describe the
+historical local layout and should not be interpreted as files included in this
+repository. The summary publishes separate membership hashes for the full,
+report-traced, and untraced sets so this boundary can be checked exactly.
+
+For future reconstruction, the official RSNA challenge archive is the
+authoritative input. The command below verifies each selected DICOM against the
+raw hash in the manifest. That clean official-archive reconstruction has not
+been executed independently for this release.
 
 Reconstruct the fixed subset from the official complete training archive:
 

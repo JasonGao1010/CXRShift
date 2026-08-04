@@ -35,15 +35,37 @@ def main() -> int:
             )
 
     config_expectations = {
-        "DenseNet121__ERM.yaml": ("DenseNet121", "ERM"),
-        "ConvNeXt-Tiny__ERM.yaml": ("ConvNeXt-Tiny", "ERM"),
-        "ViT-B16__ERM.yaml": ("ViT-B/16", "ERM"),
-        "DenseNet121__ERM-Reg.yaml": ("DenseNet121", "ERM-Reg"),
+        "DenseNet121__ERM.yaml": ("DenseNet121", "ERM", "Kermany-FG", ()),
+        "ConvNeXt-Tiny__ERM.yaml": ("ConvNeXt-Tiny", "ERM", "Kermany-FG", ()),
+        "ViT-B16__ERM.yaml": ("ViT-B/16", "ERM", "Kermany-FG", ()),
+        "DenseNet121__ERM-Reg.yaml": (
+            "DenseNet121",
+            "ERM-Reg",
+            "Kermany-FG",
+            (),
+        ),
+        "DenseNet121__JT.yaml": (
+            "DenseNet121",
+            "JT",
+            "Kermany-FG+RSNA-1707",
+            (),
+        ),
+        "DenseNet121__JT-DBS.yaml": (
+            "DenseNet121",
+            "JT-DBS",
+            "Kermany-FG+RSNA-1707",
+            ("kermany", "rsna"),
+        ),
     }
     for filename, expected in config_expectations.items():
         data = yaml.safe_load((ROOT / "configs" / filename).read_text(encoding="utf-8"))
         identity = data.get("protocol", {})
-        actual = (identity.get("model"), identity.get("recipe"))
+        actual = (
+            identity.get("model"),
+            identity.get("recipe"),
+            identity.get("training_dataset"),
+            tuple(data.get("training", {}).get("domain_balanced_prefixes", ())),
+        )
         if identity.get("id") != "CXRShift" or actual != expected:
             errors.append(f"configs/{filename}: invalid protocol identity {identity}")
 

@@ -56,6 +56,15 @@ def add_value_labels(axis: Any, bars: Any) -> None:
         )
 
 
+def asymmetric_errors(
+    values: list[float], intervals: list[list[float]]
+) -> np.ndarray:
+    """Convert absolute percentage intervals to matplotlib bar errors."""
+    lows = [value - interval[0] * 100 for value, interval in zip(values, intervals)]
+    highs = [interval[1] * 100 - value for value, interval in zip(values, intervals)]
+    return np.asarray([lows, highs])
+
+
 def render(summary: dict[str, Any], output: Path) -> None:
     """Render baseline source shift and DenseNet strategy comparisons."""
     baseline = {
@@ -65,14 +74,28 @@ def render(summary: dict[str, Any], output: Path) -> None:
         * 100
         for row in summary["groups"]
     }
+    baseline_ci = {
+        (canonical_dataset(row["dataset"]), row["model"]): row[
+            "ensemble_group_bootstrap_95ci"
+        ]["balanced_accuracy"]
+        for row in summary["groups"]
+    }
     strategies = {
         ("ERM", dataset): baseline[(dataset, "DenseNet121")] for dataset in COLORS
     }
+    strategy_ci = {
+        ("ERM", dataset): baseline_ci[(dataset, "DenseNet121")]
+        for dataset in COLORS
+    }
     for row in summary["paired_comparisons"]:
         dataset = canonical_dataset(row["dataset"])
-        strategies[(canonical_strategy(row), dataset)] = (
+        strategy = canonical_strategy(row)
+        strategies[(strategy, dataset)] = (
             row["candidate_ensemble"]["balanced_accuracy"] * 100
         )
+        strategy_ci[(strategy, dataset)] = row["candidate_group_bootstrap_95ci"][
+            "balanced_accuracy"
+        ]
 
     plt.rcParams.update(
         {
@@ -92,12 +115,18 @@ def render(summary: dict[str, Any], output: Path) -> None:
     width = 0.34
     x_models = np.arange(len(MODEL_ORDER))
     for offset, dataset in ((-width / 2, "Kermany-FG"), (width / 2, "RSNA-1707")):
+        values = [baseline[(dataset, model)] for model in MODEL_ORDER]
         bars = axes[0].bar(
             x_models + offset,
-            [baseline[(dataset, model)] for model in MODEL_ORDER],
+            values,
             width,
             label=dataset,
             color=COLORS[dataset],
+            yerr=asymmetric_errors(
+                values, [baseline_ci[(dataset, model)] for model in MODEL_ORDER]
+            ),
+            capsize=2.5,
+            error_kw={"elinewidth": 0.9, "capthick": 0.9},
         )
         add_value_labels(axes[0], bars)
     axes[0].set_title("Backbone comparison", loc="left", weight="bold")
@@ -109,11 +138,18 @@ def render(summary: dict[str, Any], output: Path) -> None:
 
     x_strategies = np.arange(len(STRATEGY_ORDER))
     for offset, dataset in ((-width / 2, "Kermany-FG"), (width / 2, "RSNA-1707")):
+        values = [strategies[(strategy, dataset)] for strategy in STRATEGY_ORDER]
         bars = axes[1].bar(
             x_strategies + offset,
-            [strategies[(strategy, dataset)] for strategy in STRATEGY_ORDER],
+            values,
             width,
             color=COLORS[dataset],
+            yerr=asymmetric_errors(
+                values,
+                [strategy_ci[(strategy, dataset)] for strategy in STRATEGY_ORDER],
+            ),
+            capsize=2.5,
+            error_kw={"elinewidth": 0.9, "capthick": 0.9},
         )
         add_value_labels(axes[1], bars)
     axes[1].set_title("DenseNet121 training strategies", loc="left", weight="bold")

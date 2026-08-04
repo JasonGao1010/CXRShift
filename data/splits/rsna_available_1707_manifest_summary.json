@@ -1,17 +1,24 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "ok": true,
   "member_count": 1707,
   "expected_member_count": 1707,
-  "metadata": {
-    "path": "data/processed/rsna_binary/metadata.csv",
-    "sha256": "1169566e5590442a7aa09a5aac0ec043dae2c67c1163c80acacd5eae5e0142a4"
+  "historical_metadata": {
+    "recorded_path": "data/processed/rsna_binary/metadata.csv",
+    "sha256": "1169566e5590442a7aa09a5aac0ec043dae2c67c1163c80acacd5eae5e0142a4",
+    "status": "checksum retained; file not distributed"
   },
   "manifest": {
     "path": "data/splits/rsna_available_1707_manifest.csv",
-    "sha256": "76ea17aae923954deca87834c1cdca6de0383bee3e461de29840a4564d247ae1",
+    "sha256": "20b924eb074455c5194ab74235afbc593cabc87a80b77965764ff2a2ebce87fe",
     "hash_algorithm": "SHA-256",
-    "path_format": "project-relative POSIX"
+    "path_format": "historical project-relative POSIX"
+  },
+  "membership_identity": {
+    "hash_definition": "SHA-256 over sorted patientId values, separated by LF and terminated by LF",
+    "all_1707_sha256": "7f80d6cc21f8535fd1f257cd9a3bace60404515b5fe6fbed2f3a1e10e0cf42db",
+    "report_traced_1573_sha256": "1013d02c761d36a0c217bc1d7cf663b511d7d1ecc2c8496d0cd5f8f4918788f3",
+    "untraced_134_sha256": "d6e7fe5fbe14e2865d4109d7bc48c9cb3022f32a9bd5106ec4efac6420e23936"
   },
   "split_label_counts": {
     "test": {
@@ -27,25 +34,37 @@
       "PNEUMONIA": 106
     }
   },
+  "source_record_coverage": {
+    "retained_report_members": 1573,
+    "untraced_members": 134,
+    "retained_report_fraction": 0.9214997070884593
+  },
   "source_batch_counts": {
     "rsna_hf_subset_download": 88,
     "rsna_hf_subset_download_expanded": 1485,
     "unknown": 134
   },
-  "source_reports": [
+  "retained_source_reports": [
     {
-      "path": "results/rsna_hf_subset_download.json",
-      "sha256": "d04710f0a3a270887957e4ec3507713ded256163b5d6383d32e16d40d2948461",
+      "id": "retained-local-report:rsna_hf_subset_download",
+      "sha256": "56aa93b9b2f9a12364b377d84a48caa5858d551cbf780be38730a0e2090f96f6",
       "listed_member_count": 88,
-      "source_provider": "Hugging Face mirror Baldezo313/rsna-pneumonia-dataset"
+      "source_provider": "Hugging Face mirror Baldezo313/rsna-pneumonia-dataset",
+      "distribution_status": "report retained locally; not distributed"
     },
     {
-      "path": "results/rsna_hf_subset_download_expanded.json",
-      "sha256": "33a3da6bd5b565e1b45c1d8f73b2a1797dafbd5c87b5a23b16e2ffb461ec6646",
+      "id": "retained-local-report:rsna_hf_subset_download_expanded",
+      "sha256": "c6f6bfa561608d72942a5d7523a06ec77a1fe61d0f6f600caf3d028ac902b802",
       "listed_member_count": 1573,
-      "source_provider": "Hugging Face mirror Baldezo313/rsna-pneumonia-dataset"
+      "source_provider": "Hugging Face mirror Baldezo313/rsna-pneumonia-dataset",
+      "distribution_status": "report retained locally; not distributed",
+      "relationship": "contains all 88 members listed by the earlier report"
     }
   ],
-  "source_batch_semantics": "Earliest retained downloader report listing the member; this records documented availability, not a proven first-download event. Members absent from all retained reports are marked unknown.",
+  "source_record_limit": "Retained reports document mirror availability for 1,573 members, not a provable first-download event. No retained source report establishes the acquisition route for the remaining 134 members; those rows remain explicitly untraced.",
+  "official_archive_reconstruction": {
+    "status": "not independently executed for this release",
+    "verification_material": "The manifest records raw DICOM hashes for checking a future reconstruction from the official archive."
+  },
   "raw_and_processed_data_modified": false
 }

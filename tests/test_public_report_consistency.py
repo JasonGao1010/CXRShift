@@ -43,6 +43,16 @@ def test_release_contains_exactly_the_complete_prediction_matrix():
     assert referenced == expected
 
 
+def test_strategy_summary_includes_absolute_and_paired_uncertainty():
+    for comparison in load_summary()["paired_comparisons"]:
+        point = comparison["candidate_ensemble"]["balanced_accuracy"]
+        low, high = comparison["candidate_group_bootstrap_95ci"][
+            "balanced_accuracy"
+        ]
+        assert low <= point <= high
+        assert "balanced_accuracy" in comparison["paired_group_bootstrap_95ci"]
+
+
 def test_prediction_paths_are_relative_and_records_are_aligned():
     for path in sorted((ROOT / "results").glob("*__predictions.csv")):
         with path.open(newline="", encoding="utf-8") as handle:

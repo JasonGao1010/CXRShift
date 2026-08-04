@@ -449,6 +449,13 @@ def main() -> int:
                 args.bootstrap,
                 args.bootstrap_seed,
             )
+            candidate_ci = bootstrap_ci(
+                candidate["labels"],
+                candidate["ensemble_score"],
+                groups,
+                args.bootstrap,
+                args.bootstrap_seed,
+            )
             payload["paired_comparisons"].append(
                 {
                     "candidate_recipe": RECIPE_IDS[family],
@@ -459,6 +466,7 @@ def main() -> int:
                     "bootstrap_group_count": len(set(groups)),
                     "baseline_ensemble": baseline_metrics,
                     "candidate_ensemble": candidate_metrics,
+                    "candidate_group_bootstrap_95ci": candidate_ci,
                     "candidate_minus_baseline": differences,
                     "paired_group_bootstrap_95ci": difference_ci,
                     "candidate_prediction_files": candidate["prediction_files"],
