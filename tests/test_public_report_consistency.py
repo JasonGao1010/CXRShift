@@ -1,6 +1,9 @@
 import csv
 import json
+import sys
 from pathlib import Path
+
+from scripts import render_report_figures
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +73,24 @@ def test_public_tree_contains_no_dataset_derived_medical_images():
         if ".git" not in path.parts and "rebuild" not in path.parts
     }
     assert images == {"figures/cross_source_summary.png"}
+
+
+def test_figure_cli_accepts_an_absolute_output_path(tmp_path, monkeypatch):
+    output = tmp_path / "summary.png"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "render_report_figures.py",
+            "--summary",
+            str(SUMMARY),
+            "--output",
+            str(output),
+        ],
+    )
+
+    assert render_report_figures.main() == 0
+    assert output.is_file()
 
 
 def test_public_narrative_preserves_the_key_scope_conditions():

@@ -182,7 +182,11 @@ def main() -> int:
     summary = args.summary if args.summary.is_absolute() else ROOT / args.summary
     output = args.output if args.output.is_absolute() else ROOT / args.output
     render(load_summary(summary), output)
-    print(f"Wrote {output.relative_to(ROOT)}")
+    try:
+        display_path = output.relative_to(ROOT)
+    except ValueError:
+        display_path = output
+    print(f"Wrote {display_path}")
     return 0
 
 
