@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/JasonGao1010/CXRShift)](https://github.com/JasonGao1010/CXRShift/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2f6f62.svg)](LICENSE)
 
-**An evidence-backed study of cross-source robustness in chest X-ray
+**CXRShift studies cross-source performance changes in chest X-ray
 classification.** Across three ImageNet-pretrained backbones and three random
 seeds, balanced accuracy decreases from **97.27–98.17%** on Kermany-FG to
 **65.91–66.95%** on RSNA-1707. Within this protocol, none of the tested
@@ -61,7 +61,7 @@ to a known source, not zero-shot generalization to an unseen institution.
 The complete machine-readable result is
 [`results/CXRShift__main-summary.json`](results/CXRShift__main-summary.json).
 
-## What the evidence supports
+## Findings and scope
 
 - The cross-source gap is consistent across DenseNet121, ConvNeXt-Tiny, and
   ViT-B/16, so backbone substitution alone is not supported as a remedy.
